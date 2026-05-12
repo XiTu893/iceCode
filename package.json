@@ -50,6 +50,7 @@
     "ide:electron": "cd ide && bun run electron:dev",
     "ide:build": "cd ide && bun run build",
     "ide:typecheck": "cd ide && bun run typecheck",
+    "ide:package": "bun run scripts/package.ts",
     "test": "bun test",
     "test:coverage": "bun test --coverage --coverage-reporter=lcov --coverage-dir=coverage --max-concurrency=1 && bun run scripts/render-coverage-heatmap.ts",
     "test:coverage:ui": "bun run scripts/render-coverage-heatmap.ts",
