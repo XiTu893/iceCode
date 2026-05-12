@@ -1,0 +1,53 @@
+appId: com.xitu893.icecode
+productName: IceCode IDE
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist/**/*
+  - dist/cli.mjs
+  - bin/**/*
+  - package.json
+
+extraResources:
+  - from: dist
+    to: cli
+    filter:
+      - "**/*"
+  - from: bin
+    to: bin
+    filter:
+      - "**/*"
+
+win:
+  target:
+    - nsis
+    - zip
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: IceCode IDE
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+
+mac:
+  target:
+    - dmg
+    - zip
+  icon: build/icon.icns
+  category: public.app-category.developer-tools
+
+linux:
+  target:
+    - AppImage
+    - deb
+  icon: build/icon.png
+  category: Development
+
+asar: true
+compression: maximum
