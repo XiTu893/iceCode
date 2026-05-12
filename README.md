@@ -13,7 +13,7 @@ Use OpenAI-compatible APIs, Gemini, GitHub Models, Codex OAuth, Ollama, and othe
 IceCode is also mirrored to GitLawb:
 [gitlawb.com/node/repos/z6MkqDnb/icecode](https://gitlawb.com/node/repos/z6MkqDnb/icecode)
 
-[Quick Start](#quick-start) | [Setup Guides](#setup-guides) | [Providers](#supported-providers) | [Source Build](#source-build-and-local-development) | [VS Code Extension](#vs-code-extension) | [Sponsors](#sponsors) | [Community](#community)
+[Quick Start](#quick-start) | [Setup Guides](#setup-guides) | [Providers](#supported-providers) | [Source Build](#source-build-and-local-development) | [Sponsors](#sponsors) | [Community](#community)
 
 ## Sponsors
 
@@ -49,7 +49,6 @@ IceCode is also mirrored to GitLawb:
 - Save provider profiles inside the app with `/provider`
 - Run with OpenAI-compatible services, Gemini, GitHub Models, Codex OAuth, Codex, Ollama, Atomic Chat, and other supported providers
 - Keep coding-agent workflows in one place: bash, file tools, grep, glob, agents, tasks, MCP, and web tools
-- Use the bundled VS Code extension for launch integration and theme support
 
 ## Quick Start
 
@@ -330,13 +329,9 @@ Coverage output is written to `coverage/lcov.info`, and OpenClaude also generate
 - `scripts/` - build, verification, and maintenance scripts
 - `docs/` - setup, contributor, and project documentation
 - `python/` - standalone Python helpers and their tests
-- `vscode-extension/openclaude-vscode/` - VS Code extension
 - `.github/` - repo automation, templates, and CI configuration
 - `bin/` - CLI launcher entrypoints
-
-## VS Code Extension
-
-The repo includes a VS Code extension in [`vscode-extension/openclaude-vscode`](vscode-extension/openclaude-vscode) for OpenClaude launch integration, provider-aware control-center UI, and theme support.
+- `ide/` - Electron-based desktop IDE
 
 ## Security
 
