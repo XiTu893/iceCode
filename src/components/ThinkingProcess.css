@@ -1,0 +1,258 @@
+/* 思维过程组件样式 */
+
+.thinking-process {
+  background: rgba(25, 25, 35, 0.95);
+  border: 1px solid #3a3a4a;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  color: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.thinking-process.collapsed {
+  padding: 8px 12px;
+}
+
+/* 标题栏 */
+.thinking-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #3a3a4a;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+.thinking-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.thinking-header .title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.thinking-header .step-count {
+  font-size: 12px;
+  color: #888;
+}
+
+.thinking-header .toggle-icon {
+  margin-left: auto;
+  font-size: 10px;
+  color: #666;
+}
+
+/* 内容区域 */
+.thinking-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.steps-list {
+  position: relative;
+  padding-left: 20px;
+}
+
+/* 思维步骤 */
+.thinking-step {
+  position: relative;
+  padding: 8px 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.thinking-step.first-visible {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 连接线 */
+.step-connector {
+  position: absolute;
+  left: -14px;
+  top: 24px;
+  bottom: -8px;
+  width: 2px;
+  background: linear-gradient(to bottom, #4a4a5a, transparent);
+}
+
+.thinking-step.last .step-connector {
+  display: none;
+}
+
+/* 步骤内容 */
+.step-content {
+  position: relative;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.step-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.step-message {
+  flex: 1;
+  color: #e0e0e0;
+  line-height: 1.4;
+}
+
+.step-time {
+  font-size: 11px;
+  color: #666;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* 详细信息 */
+.step-details {
+  margin-top: 4px;
+  margin-left: 24px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.5;
+  border-left: 2px solid #4a4a5a;
+}
+
+/* 元数据 */
+.step-metadata {
+  margin-top: 4px;
+  margin-left: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.metadata-item {
+  font-size: 11px;
+  padding: 2px 8px;
+  background: rgba(74, 74, 90, 0.3);
+  border-radius: 3px;
+  color: #999;
+}
+
+/* 状态样式 */
+.status-pending .step-icon {
+  opacity: 0.5;
+}
+
+.status-running .step-icon {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.status-running .step-message {
+  color: #60a5fa;
+}
+
+.status-completed .step-message {
+  color: #4ade80;
+}
+
+.status-failed .step-message {
+  color: #f87171;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* 展开按钮 */
+.expand-button {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: rgba(74, 74, 90, 0.3);
+  border: 1px solid #4a4a5a;
+  border-radius: 4px;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.expand-button:hover {
+  background: rgba(74, 74, 90, 0.5);
+  color: #e0e0e0;
+  border-color: #6a6a7a;
+}
+
+/* 滚动条样式 */
+.thinking-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.thinking-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.thinking-content::-webkit-scrollbar-thumb {
+  background: #4a4a5a;
+  border-radius: 3px;
+}
+
+.thinking-content::-webkit-scrollbar-thumb:hover {
+  background: #5a5a6a;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .thinking-process {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .step-details {
+    margin-left: 20px;
+    font-size: 11px;
+  }
+
+  .step-metadata {
+    margin-left: 20px;
+  }
+
+  .step-time {
+    display: none;
+  }
+}
