@@ -3,9 +3,9 @@
  * 
  * 功能：
  * 1. 构建CLI核心代码
- * 2. 构建IDE前端和Electron应用
- * 3. 打包所有依赖到一个安装包
- * 4. 生成可独立运行的安装程序
+ * 2. 构建Electron应用
+ * 3. 调用electron-builder打包为安装包
+ * 4. 生成打包报告
  */
 
 import { $ } from 'bun'
@@ -15,7 +15,6 @@ import path from 'path'
 const ROOT_DIR = process.cwd()
 const IDE_DIR = path.join(ROOT_DIR, 'ide')
 const RELEASE_DIR = path.join(IDE_DIR, 'release')
-const BUILD_DIR = path.join(IDE_DIR, 'dist')
 
 // 颜色输出
 const colors = {

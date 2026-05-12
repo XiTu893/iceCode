@@ -1,0 +1,96 @@
+name: Build and Release IDE
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 0.9.3)'
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Build IDE on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Install dependencies
+        run: |
+          cd ide
+          bun install
+          
+      - name: Build CLI
+        run: bun run build
+        
+      - name: Build Electron app
+        run: |
+          cd ide
+          bun run electron:build
+          
+      - name: Package for Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd ide
+          npx electron-builder --win --x64
+          
+      - name: Package for macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          cd ide
+          npx electron-builder --mac
+          
+      - name: Package for Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd ide
+          npx electron-builder --linux
+          
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: icecode-ide-${{ matrix.os }}
+          path: ide/release/*
+          retention-days: 30
+          
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            **/*.exe
+            **/*.dmg
+            **/*.AppImage
+            **/*.deb
+            **/*.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
