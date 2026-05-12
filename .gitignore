@@ -15,6 +15,9 @@ coverage/
 agent.log
 plan/
 
+# Trae IDE configuration (not for public)
+.trae/
+
 # IDE internal docs (not for public)
 ide/CHECKLIST.md
 ide/CHINESE_UI_COMPLETION.md
