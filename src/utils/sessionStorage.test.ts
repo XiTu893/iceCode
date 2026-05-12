@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from 'bun:test'
+﻿import { afterEach, expect, test } from 'bun:test'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -88,7 +88,7 @@ function compactBoundary(
 }
 
 async function writeJsonl(entries: unknown[]): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), 'openclaude-session-storage-'))
+  const dir = await mkdtemp(join(tmpdir(), 'IceCode-session-storage-'))
   tempDirs.push(dir)
   const filePath = join(dir, 'session.jsonl')
   await writeFile(filePath, `${entries.map(e => JSON.stringify(e)).join('\n')}\n`)

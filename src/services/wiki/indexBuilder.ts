@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from 'fs/promises'
+﻿import { readdir, readFile, writeFile } from 'fs/promises'
 import { basename, relative } from 'path'
 import { getWikiPaths } from './paths.js'
 
@@ -49,7 +49,7 @@ export async function rebuildWikiIndex(cwd: string): Promise<void> {
 
   const content = `# ${basename(cwd)} Wiki
 
-This wiki is maintained by OpenClaude as a durable project knowledge layer.
+This wiki is maintained by IceCode as a durable project knowledge layer.
 
 ## Core Pages
 

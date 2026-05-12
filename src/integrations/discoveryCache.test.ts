@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+﻿import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import { join } from 'path'
@@ -31,7 +31,7 @@ function createModel(id: string): ModelCatalogEntry {
 }
 
 beforeEach(async () => {
-  tempDir = mkdtempSync(join(tmpdir(), 'openclaude-discovery-cache-test-'))
+  tempDir = mkdtempSync(join(tmpdir(), 'IceCode-discovery-cache-test-'))
   process.env.CLAUDE_CONFIG_DIR = tempDir
   setOriginalFsImplementation()
   await clearDiscoveryCache()

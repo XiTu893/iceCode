@@ -1,4 +1,4 @@
-import { execaSync } from 'execa'
+﻿import { execaSync } from 'execa'
 import { join } from 'path'
 import { getClaudeConfigHomeDir } from '../envUtils.js'
 import { jsonParse, jsonStringify } from '../slowOperations.js'
@@ -31,7 +31,7 @@ function getWindowsSecureStorageFilePath(): string {
 }
 
 function shouldUseLegacyPasswordVault(): boolean {
-  return process.env.OPENCLAUDE_ENABLE_LEGACY_WINDOWS_PASSWORDVAULT === '1'
+  return process.env.IceCode_ENABLE_LEGACY_WINDOWS_PASSWORDVAULT === '1'
 }
 
 function runPowerShell(

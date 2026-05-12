@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from 'bun:test'
+﻿import { afterEach, expect, test } from 'bun:test'
 import { mkdtemp, readFile, rm, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
@@ -14,7 +14,7 @@ afterEach(async () => {
 })
 
 async function makeProjectDir(): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), 'openclaude-wiki-ingest-'))
+  const dir = await mkdtemp(join(tmpdir(), 'IceCode-wiki-ingest-'))
   tempDirs.push(dir)
   return dir
 }
@@ -33,7 +33,7 @@ test('ingestLocalWikiSource creates a source note and updates log/index', async 
 
   expect(result.sourceFile).toBe('notes.md')
   expect(result.title).toBe('Design Notes')
-  expect(result.sourceNote.startsWith('.openclaude/wiki/sources/')).toBe(true)
+  expect(result.sourceNote.startsWith('.IceCode/wiki/sources/')).toBe(true)
 
   const sourceNote = await readFile(join(cwd, result.sourceNote), 'utf8')
   expect(sourceNote).toContain('# Design Notes')
@@ -44,5 +44,5 @@ test('ingestLocalWikiSource creates a source note and updates log/index', async 
 
   const index = await readFile(paths.indexFile, 'utf8')
   expect(index).toContain('./sources/')
-  expect(index).toContain(result.sourceNote.replace('.openclaude/wiki/', './'))
+  expect(index).toContain(result.sourceNote.replace('.IceCode/wiki/', './'))
 })

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+﻿import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { mkdtemp, mkdir, rm, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { dirname, join } from 'path'
@@ -18,8 +18,8 @@ const originalEnv = {
 let tempDir: string
 
 beforeEach(async () => {
-  tempDir = await mkdtemp(join(tmpdir(), 'openclaude-agents-test-'))
-  process.env.CLAUDE_CONFIG_DIR = join(tempDir, '.openclaude')
+  tempDir = await mkdtemp(join(tmpdir(), 'IceCode-agents-test-'))
+  process.env.CLAUDE_CONFIG_DIR = join(tempDir, '.IceCode')
   process.env.CLAUDE_CODE_USE_NATIVE_FILE_SEARCH = '1'
   delete process.env.CLAUDE_CODE_SIMPLE
   clearAgentDefinitionsCache()
@@ -63,7 +63,7 @@ ${prompt}
 }
 
 describe('agent definition loading', () => {
-  test('loads user agents from the OpenClaude config dir in simple mode', async () => {
+  test('loads user agents from the IceCode config dir in simple mode', async () => {
     await writeAgent(
       join(process.env.CLAUDE_CONFIG_DIR!, 'agents', 'user-agent.md'),
       'user-agent',
@@ -80,10 +80,10 @@ describe('agent definition loading', () => {
     )
   })
 
-  test('loads project agents from .openclaude/agents', async () => {
+  test('loads project agents from .IceCode/agents', async () => {
     const projectDir = join(tempDir, 'project')
     await writeAgent(
-      join(projectDir, '.openclaude', 'agents', 'project-agent.md'),
+      join(projectDir, '.IceCode', 'agents', 'project-agent.md'),
       'project-agent',
     )
 
@@ -94,7 +94,7 @@ describe('agent definition loading', () => {
     ).toBe(true)
   })
 
-  test('prefers .openclaude project agents over legacy .claude agents', async () => {
+  test('prefers .IceCode project agents over legacy .claude agents', async () => {
     const projectDir = join(tempDir, 'project')
     await writeAgent(
       join(projectDir, '.claude', 'agents', 'shared-agent.md'),
@@ -102,14 +102,14 @@ describe('agent definition loading', () => {
       'legacy prompt',
     )
     await writeAgent(
-      join(projectDir, '.openclaude', 'agents', 'shared-agent.md'),
+      join(projectDir, '.IceCode', 'agents', 'shared-agent.md'),
       'shared-agent',
-      'openclaude prompt',
+      'IceCode prompt',
     )
 
     const { activeAgents } = await getAgentDefinitionsWithOverrides(projectDir)
     const agent = activeAgents.find(agent => agent.agentType === 'shared-agent')
 
-    expect(agent?.getSystemPrompt()).toBe('openclaude prompt')
+    expect(agent?.getSystemPrompt()).toBe('IceCode prompt')
   })
 })

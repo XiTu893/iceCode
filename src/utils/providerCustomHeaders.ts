@@ -1,4 +1,4 @@
-const HEADER_NAME_RE = /^[A-Za-z0-9!#$%&'*+.^_`|~-]+$/
+﻿const HEADER_NAME_RE = /^[A-Za-z0-9!#$%&'*+.^_`|~-]+$/
 
 const RESERVED_HEADER_NAMES = new Set([
   'authorization',
@@ -63,7 +63,7 @@ export function parseProfileCustomHeadersInput(input: string): {
     if (isReservedHeaderName(name)) {
       return {
         headers: {},
-        error: `Custom header "${name}" is managed by OpenClaude and cannot be set on a provider profile.`,
+        error: `Custom header "${name}" is managed by IceCode and cannot be set on a provider profile.`,
       }
     }
     if (!value) {

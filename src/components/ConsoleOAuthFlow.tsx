@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+﻿import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS, logEvent } from 'src/services/analytics/index.js';
 import { installOAuthTokens } from '../cli/handlers/auth.js';
 import { useTerminalSize } from '../hooks/useTerminalSize.js';
@@ -262,7 +262,7 @@ export function ConsoleOAuthFlow({
           state: 'success'
         });
         void sendNotification({
-          message: 'OpenClaude login successful',
+          message: 'IceCode login successful',
           notificationType: 'auth_success'
         }, terminal);
       }
@@ -384,7 +384,7 @@ function OAuthStatusMessage({
     case 'idle': {
       const promptText =
         startingMessage ||
-        'OpenClaude can be used with your Claude subscription or billed based on API usage through your Console account.'
+        'IceCode can be used with your Claude subscription or billed based on API usage through your Console account.'
 
       const loginOptions = [
         {
@@ -512,7 +512,7 @@ function OAuthStatusMessage({
         <Box flexDirection="column" gap={1}>
           <Box>
             <Spinner />
-            <Text>Creating API key for OpenClaude…</Text>
+            <Text>Creating API key for IceCode…</Text>
           </Box>
         </Box>
       )

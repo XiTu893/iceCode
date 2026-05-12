@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Plugin and marketplace subcommand handlers — extracted from main.tsx for lazy loading.
  * These are dynamically imported only when `claude plugin *` or `claude plugin marketplace *` runs.
  */
@@ -352,7 +352,7 @@ export async function pluginListHandler(options: {
     // through to the session section so the failure is visible.
     if (inlineLoadErrors.length === 0) {
       cliOk(
-        'No plugins installed. Use `openclaude plugin install` to install a plugin.',
+        'No plugins installed. Use `IceCode plugin install` to install a plugin.',
       )
     }
   }

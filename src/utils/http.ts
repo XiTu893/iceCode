@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HTTP utility constants and helpers
  */
 
@@ -58,7 +58,7 @@ export function getWebFetchUserAgent(): string {
   const supportUrl =
     getAPIProvider() === 'firstParty'
       ? 'https://support.anthropic.com/'
-      : 'https://github.com/Gitlawb/openclaude'
+      : 'https://github.com/XiTu893/IceCode'
   return `Claude-User (${getClaudeCodeUserAgent()}; +${supportUrl})`
 }
 

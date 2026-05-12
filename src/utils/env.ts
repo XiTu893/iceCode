@@ -1,4 +1,4 @@
-import memoize from 'lodash-es/memoize.js'
+﻿import memoize from 'lodash-es/memoize.js'
 import { homedir } from 'os'
 import { join } from 'path'
 import { fileSuffixForOauthConfig } from '../constants/oauth.js'
@@ -24,10 +24,10 @@ export const getGlobalClaudeFile = memoize((): string => {
   const oauthSuffix = fileSuffixForOauthConfig()
   const configDir = process.env.CLAUDE_CONFIG_DIR || homedir()
 
-  // Default to .openclaude.json. Fall back to .claude.json only if the new
+  // Default to .IceCode.json. Fall back to .claude.json only if the new
   // file doesn't exist yet and the legacy one does (same migration pattern
   // as resolveClaudeConfigHomeDir for the config directory).
-  const newFilename = `.openclaude${oauthSuffix}.json`
+  const newFilename = `.IceCode${oauthSuffix}.json`
   const legacyFilename = `.claude${oauthSuffix}.json`
   if (
     !getFsImplementation().existsSync(join(configDir, newFilename)) &&

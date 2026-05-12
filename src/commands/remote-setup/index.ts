@@ -1,4 +1,4 @@
-import type { Command } from '../../commands.js'
+﻿import type { Command } from '../../commands.js'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js'
 import { isPolicyAllowed } from '../../services/policyLimits/index.js'
 
@@ -6,7 +6,7 @@ const web = {
   type: 'local-jsx',
   name: 'web-setup',
   description:
-    'Setup OpenClaude on the web (requires connecting your GitHub account)',
+    'Setup IceCode on the web (requires connecting your GitHub account)',
   availability: ['claude-ai'],
   isEnabled: () =>
     getFeatureValue_CACHED_MAY_BE_STALE('tengu_cobalt_lantern', false) &&

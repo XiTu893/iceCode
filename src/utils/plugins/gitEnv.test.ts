@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+﻿import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import {
   __resetGitEnvWarningForTesting,
@@ -59,7 +59,7 @@ describe('sanitizeEnvForGit', () => {
 })
 
 describe('buildGitChildEnv', () => {
-  const ORIGINAL_BAD_KEY = 'OPENCLAUDE_TEST_BAD_ENV_FOR_GIT'
+  const ORIGINAL_BAD_KEY = 'IceCode_TEST_BAD_ENV_FOR_GIT'
   let originalValue: string | undefined
 
   beforeEach(() => {

@@ -1,5 +1,5 @@
-/**
- * FeishuSessionManager — maps Feishu chat contexts to OpenClaude sessions.
+﻿/**
+ * FeishuSessionManager — maps Feishu chat contexts to IceCode sessions.
  *
  * Each Feishu user/group/thread gets an independent session so the AI
  * maintains separate context per conversation. Sessions expire after a

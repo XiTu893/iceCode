@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+﻿import chalk from 'chalk'
 import { writeSync } from 'fs'
 import memoize from 'lodash-es/memoize.js'
 import { onExit } from 'signal-exit'
@@ -178,7 +178,7 @@ function printResumeHint(): void {
       writeSync(
         1,
         chalk.dim(
-          `\nResume this session with:\nopenclaude --resume ${resumeArg}\n`,
+          `\nResume this session with:\nIceCode --resume ${resumeArg}\n`,
         ),
       )
       resumeHintPrinted = true

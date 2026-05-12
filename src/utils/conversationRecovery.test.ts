@@ -1,4 +1,4 @@
-import { afterEach, expect, mock, test } from 'bun:test'
+﻿import { afterEach, expect, mock, test } from 'bun:test'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -52,7 +52,7 @@ function user(uuid: string, content: string) {
 }
 
 async function writeJsonl(entry: unknown): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), 'openclaude-conversation-recovery-'))
+  const dir = await mkdtemp(join(tmpdir(), 'IceCode-conversation-recovery-'))
   tempDirs.push(dir)
   const filePath = join(dir, 'resume.jsonl')
   await writeFile(filePath, `${JSON.stringify(entry)}\n`)

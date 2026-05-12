@@ -1,4 +1,4 @@
-import { homedir } from 'os';
+﻿import { homedir } from 'os';
 import { basename, join, sep } from 'path';
 import React, { type ReactNode } from 'react';
 import { getOriginalCwd } from '../../../bootstrap/state.js';
@@ -104,7 +104,7 @@ export function getFilePermissionOptions({
   // persisted permission rules.
   if ((inClaudeFolder || inGlobalClaudeFolder) && operationType !== 'read') {
     options.push({
-      label: 'Yes, and allow OpenClaude to edit its own settings for this session',
+      label: 'Yes, and allow IceCode to edit its own settings for this session',
       value: 'yes-claude-folder',
       option: {
         type: 'accept-session',

@@ -1,4 +1,4 @@
-import { createHash } from 'crypto'
+﻿import { createHash } from 'crypto'
 import { statSync } from 'fs'
 import { join, resolve } from 'path'
 import { HOOK_EVENTS } from 'src/entrypoints/agentSdkTypes.js'
@@ -24,7 +24,7 @@ type HookEvent = (typeof HOOK_EVENTS)[number]
 
 const HOOK_CHAINS_CONFIG_ENV_PATH = 'CLAUDE_CODE_HOOK_CHAINS_CONFIG_PATH'
 const HOOK_CHAINS_ENABLED_ENV = 'CLAUDE_CODE_ENABLE_HOOK_CHAINS'
-const DEFAULT_HOOK_CHAINS_RELATIVE_PATH = join('.openclaude', 'hook-chains.json')
+const DEFAULT_HOOK_CHAINS_RELATIVE_PATH = join('.IceCode', 'hook-chains.json')
 const DEFAULT_MAX_CHAIN_DEPTH = 2
 const DEFAULT_RULE_COOLDOWN_MS = 30_000
 const DEFAULT_DEDUP_WINDOW_MS = 30_000
@@ -1057,7 +1057,7 @@ export async function executeWarmRemoteCapacityAction(args: {
       action.createDefaultEnvironmentIfMissing === true
     ) {
       const created = await envApi.createDefaultCloudEnvironment(
-        'OpenClaude Self-Healing Warmup',
+        'IceCode Self-Healing Warmup',
       )
       selection = {
         availableEnvironments: [created],

@@ -1,4 +1,4 @@
-import { APIError } from '@anthropic-ai/sdk'
+﻿import { APIError } from '@anthropic-ai/sdk'
 import { buildAnthropicUsageFromRawUsage } from './cacheMetrics.js'
 import { compressToolHistory } from './compressToolHistory.js'
 import { fetchWithProxyRetry } from './fetchWithProxyRetry.js'
@@ -557,7 +557,7 @@ export async function performCodexRequest(options: {
   if (options.credentials.accountId) {
     headers['chatgpt-account-id'] = options.credentials.accountId
   }
-  headers.originator ??= 'openclaude'
+  headers.originator ??= 'IceCode'
 
   const response = await fetchWithProxyRetry(
     `${options.request.baseUrl}/responses`,

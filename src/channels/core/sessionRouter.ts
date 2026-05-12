@@ -1,5 +1,5 @@
-/**
- * SessionRouter — maps external chat contexts to OpenClaude session IDs.
+﻿/**
+ * SessionRouter — maps external chat contexts to IceCode session IDs.
  *
  * Each Channel adapter resolves its own sessions, but the router provides
  * a central registry so the Gateway can look up session metadata (which

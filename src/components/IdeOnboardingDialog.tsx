@@ -1,4 +1,4 @@
-import { c as _c } from "react-compiler-runtime";
+﻿import { c as _c } from "react-compiler-runtime";
 import React from 'react';
 import { envDynamic } from 'src/utils/envDynamic.js';
 import { Box, Text } from '../ink.js';
@@ -70,7 +70,7 @@ export function IdeOnboardingDialog(t0) {
   }
   let t6;
   if ($[8] !== ideName) {
-    t6 = <>{t5}<Text>Welcome to OpenClaude for {ideName}</Text></>;
+    t6 = <>{t5}<Text>Welcome to IceCode for {ideName}</Text></>;
     $[8] = ideName;
     $[9] = t6;
   } else {

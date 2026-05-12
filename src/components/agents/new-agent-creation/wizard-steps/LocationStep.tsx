@@ -1,4 +1,4 @@
-import { c as _c } from "react-compiler-runtime";
+﻿import { c as _c } from "react-compiler-runtime";
 import { join } from 'path';
 import React, { type ReactNode } from 'react';
 import { Box } from '../../../../ink.js';
@@ -21,7 +21,7 @@ export function LocationStep() {
   let t0;
   if ($[0] === Symbol.for("react.memo_cache_sentinel")) {
     t0 = {
-      label: "Project (.openclaude/agents/)",
+      label: "Project (.IceCode/agents/)",
       value: "projectSettings" as SettingSource
     };
     $[0] = t0;

@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from 'bun:test'
+﻿import { afterEach, expect, test } from 'bun:test'
 import { mkdtemp, mkdir, rm, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
@@ -15,7 +15,7 @@ afterEach(async () => {
 })
 
 async function makeProjectDir(): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), 'openclaude-wiki-status-'))
+  const dir = await mkdtemp(join(tmpdir(), 'IceCode-wiki-status-'))
   tempDirs.push(dir)
   return dir
 }

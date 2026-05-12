@@ -1,4 +1,4 @@
-import axios from 'axios'
+﻿import axios from 'axios'
 import memoize from 'lodash-es/memoize.js'
 import { hostname } from 'os'
 import { getOauthConfig } from '../constants/oauth.js'
@@ -147,7 +147,7 @@ export async function enrollTrustedDevice(): Promise<void> {
         device_id?: string
       }>(
         `${baseUrl}/api/auth/trusted_devices`,
-        { display_name: `OpenClaude on ${hostname()} · ${process.platform}` },
+        { display_name: `IceCode on ${hostname()} · ${process.platform}` },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

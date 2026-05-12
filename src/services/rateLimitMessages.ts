@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Centralized rate limit message generation
  * Single source of truth for all rate limit-related messages
  */
@@ -279,7 +279,7 @@ function getWarningUpsellText(
 
     // Pro/Max users: prompt to upgrade
     if (subscriptionType === 'pro' || subscriptionType === 'max') {
-      return '/upgrade to keep using OpenClaude'
+      return '/upgrade to keep using IceCode'
     }
   }
 

@@ -1,4 +1,4 @@
-// biome-ignore-all assist/source/organizeImports: internal-only import markers must not be reordered
+﻿// biome-ignore-all assist/source/organizeImports: internal-only import markers must not be reordered
 import { Box, Text } from '../ink.js';
 import * as React from 'react';
 import { getLargeMemoryFiles, MAX_MEMORY_CHARACTER_COUNT, type MemoryFileInfo } from './claudemd.js';
@@ -90,7 +90,7 @@ const apiKeyConflictNotice: StatusNoticeDefinition = {
         <Text color="warning">{figures.warning}</Text>
         <Text color="warning">
           Auth conflict: Using {apiKeySource} instead of Anthropic Console key.
-          Either unset {apiKeySource}, or run `openclaude /logout`.
+          Either unset {apiKeySource}, or run `IceCode /logout`.
         </Text>
       </Box>;
   }

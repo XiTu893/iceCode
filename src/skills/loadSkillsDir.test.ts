@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict'
+﻿import assert from 'node:assert/strict'
 import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -17,7 +17,7 @@ function writeSkill(rootDir: string, skillPath: string): void {
 }
 
 test('loads flat and nested skills with colon namespaces', async () => {
-  const configDir = mkdtempSync(join(tmpdir(), 'openclaude-skills-'))
+  const configDir = mkdtempSync(join(tmpdir(), 'IceCode-skills-'))
   const cwd = join(configDir, 'workspace')
   const originalConfigDir = process.env.CLAUDE_CONFIG_DIR
 

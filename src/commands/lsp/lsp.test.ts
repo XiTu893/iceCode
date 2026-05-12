@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, mock, test } from 'bun:test'
+﻿import { beforeEach, describe, expect, mock, test } from 'bun:test'
 import { mkdir, mkdtemp, rm, writeFile } from 'fs/promises'
 import { tmpdir } from 'os'
 import { join } from 'path'
@@ -368,7 +368,7 @@ describe('/lsp recommend', () => {
   })
 
   test('falls back to filesystem scanning when git cannot enumerate workspace files', async () => {
-    const tempDir = await mkdtemp(join(tmpdir(), 'openclaude-lsp-'))
+    const tempDir = await mkdtemp(join(tmpdir(), 'IceCode-lsp-'))
     try {
       await mkdir(join(tempDir, 'src'), { recursive: true })
       await writeFile(join(tempDir, 'src', 'main.ts'), 'export const x = 1\n')

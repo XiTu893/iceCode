@@ -1,4 +1,4 @@
-import { toJSONSchema } from 'zod/v4'
+﻿import { toJSONSchema } from 'zod/v4'
 import { SettingsSchema } from '../../utils/settings/types.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import { registerBundledSkill } from '../bundledSkills.js'
@@ -440,7 +440,7 @@ If a hook isn't running:
 3. **Check the matcher** - Does it match the tool name? (e.g., "Bash", "Write", "Edit")
 4. **Check hook type** - Is it "command", "prompt", or "agent"?
 5. **Test the command** - Run the hook command manually to see if it works
-6. **Use --debug** - Run \`openclaude --debug\` to see hook execution logs
+6. **Use --debug** - Run \`IceCode --debug\` to see hook execution logs
 `
 
 export function registerUpdateConfigSkill(): void {

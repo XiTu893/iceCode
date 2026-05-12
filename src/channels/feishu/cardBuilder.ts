@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FeishuCardBuilder — converts AI responses into Feishu interactive cards.
  *
  * This is the Canvas2UI engine: structured AI output (text, code, diffs,
@@ -168,7 +168,7 @@ export function createFeishuCardBuilder(): FeishuCardBuilder {
     return {
       schema: '2.0',
       header: {
-        title: { tag: 'lark_md', content: `${statusIcon} OpenClaude` },
+        title: { tag: 'lark_md', content: `${statusIcon} IceCode` },
         template: 'blue',
       },
       elements,
@@ -420,7 +420,7 @@ export function createFeishuCardBuilder(): FeishuCardBuilder {
     return {
       schema: '2.0',
       header: {
-        title: { tag: 'lark_md', content: '🤖 OpenClaude Session' },
+        title: { tag: 'lark_md', content: '🤖 IceCode Session' },
         template: 'blue',
       },
       elements: [

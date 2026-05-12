@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test'
+﻿import { describe, expect, test } from 'bun:test'
 
 import {
   parseProfileCustomHeadersInput,
@@ -23,16 +23,16 @@ describe('parseProfileCustomHeadersInput', () => {
       error: expect.stringContaining('Name: value'),
     })
     expect(parseProfileCustomHeadersInput('Authorization: Bearer token')).toMatchObject({
-      error: expect.stringContaining('managed by OpenClaude'),
+      error: expect.stringContaining('managed by IceCode'),
     })
     expect(parseProfileCustomHeadersInput('api-key: token')).toMatchObject({
-      error: expect.stringContaining('managed by OpenClaude'),
+      error: expect.stringContaining('managed by IceCode'),
     })
     expect(parseProfileCustomHeadersInput('x-api-key: token')).toMatchObject({
-      error: expect.stringContaining('managed by OpenClaude'),
+      error: expect.stringContaining('managed by IceCode'),
     })
     expect(parseProfileCustomHeadersInput('x-anthropic-danger: yes')).toMatchObject({
-      error: expect.stringContaining('managed by OpenClaude'),
+      error: expect.stringContaining('managed by IceCode'),
     })
   })
 })

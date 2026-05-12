@@ -1,4 +1,4 @@
-import { feature } from 'bun:bundle';
+﻿import { feature } from 'bun:bundle';
 import type { StructuredPatchHunk } from 'diff';
 import * as React from 'react';
 import { useExitOnCtrlCDWithKeybindings } from '../hooks/useExitOnCtrlCDWithKeybindings.js'
@@ -48,7 +48,7 @@ const DEMO_PATCH: StructuredPatchHunk = {
   lines: [
     ' function greet() {',
     '-  console.log("Hello, World!");',
-    '+  console.log("Hello, OpenClaude!");',
+    '+  console.log("Hello, IceCode!");',
     ' }',
   ],
 }

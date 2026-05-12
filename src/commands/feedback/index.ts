@@ -1,9 +1,9 @@
-import type { Command } from '../../commands.js'
+﻿import type { Command } from '../../commands.js'
 const feedback = {
   aliases: ['bug'],
   type: 'local-jsx',
   name: 'feedback',
-  description: `Submit feedback about OpenClaude`,
+  description: `Submit feedback about IceCode`,
   argumentHint: '[report]',
   isEnabled: () => false,
   load: () => import('./feedback.js'),

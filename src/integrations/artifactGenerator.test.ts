@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
+﻿import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -22,7 +22,7 @@ async function withFixtureRepo(
   callback: (repoRoot: string) => Promise<void>,
 ): Promise<void> {
   const repoRoot = await mkdtemp(
-    path.join(os.tmpdir(), 'openclaude-integration-artifacts-'),
+    path.join(os.tmpdir(), 'IceCode-integration-artifacts-'),
   )
 
   try {

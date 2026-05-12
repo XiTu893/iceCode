@@ -1,4 +1,4 @@
-import { readdir, stat } from 'fs/promises'
+﻿import { readdir, stat } from 'fs/promises'
 import { extname, join, resolve } from 'path'
 import { getAllLspServers } from '../../services/lsp/config.js'
 import {
@@ -114,7 +114,7 @@ const DISCOVERY_DIRECTORY_IGNORE_SET = new Set([
   '.git',
   '.hg',
   '.next',
-  '.openclaude',
+  '.IceCode',
   '.svn',
   'build',
   'coverage',

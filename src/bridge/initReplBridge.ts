@@ -1,4 +1,4 @@
-/**
+﻿/**
  * REPL-specific wrapper around initBridgeCore. Owns the parts that read
  * bootstrap state — gates, cwd, session ID, git context, OAuth, title
  * derivation — then delegates to the bootstrap-free core.
@@ -415,7 +415,7 @@ export async function initReplBridge(
         `[bridge:repl] Skipping: ${versionError}`,
         true,
       )
-      onStateChange?.('failed', 'run `openclaude update` to upgrade')
+      onStateChange?.('failed', 'run `IceCode update` to upgrade')
       return null
     }
     logForDebugging(
@@ -456,7 +456,7 @@ export async function initReplBridge(
   const versionError = checkBridgeMinVersion()
   if (versionError) {
     logBridgeSkip('version_too_old', `[bridge:repl] Skipping: ${versionError}`)
-    onStateChange?.('failed', 'run `openclaude update` to upgrade')
+    onStateChange?.('failed', 'run `IceCode update` to upgrade')
     return null
   }
 

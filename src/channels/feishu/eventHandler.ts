@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FeishuEventHandler — processes inbound Feishu events and routes them
  * through the Channel system.
  *
@@ -63,7 +63,7 @@ export function createFeishuEventHandler(
 
     if (chatType === 'group' && config.groupTrigger === 'mention') {
       const content = parseMessageContent(message.content, message.message_type)
-      if (!isBotMentioned(content, config.botName ?? 'OpenClaude')) {
+      if (!isBotMentioned(content, config.botName ?? 'IceCode')) {
         return
       }
     }
@@ -77,7 +77,7 @@ export function createFeishuEventHandler(
     )
 
     const content = parseMessageContent(message.content, message.message_type)
-    const cleanContent = chatType === 'group' ? stripMention(content, config.botName ?? 'OpenClaude') : content
+    const cleanContent = chatType === 'group' ? stripMention(content, config.botName ?? 'IceCode') : content
 
     const meta: Record<string, string> = {
       chat_id: chatId,

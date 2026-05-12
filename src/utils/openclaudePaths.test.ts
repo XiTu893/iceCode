@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, mock, test } from 'bun:test'
+﻿import { afterEach, describe, expect, mock, test } from 'bun:test'
 import * as fsPromises from 'fs/promises'
 import { homedir } from 'os'
 import { join } from 'path'
@@ -28,39 +28,39 @@ afterEach(() => {
   mock.restore()
 })
 
-describe('OpenClaude paths', () => {
-  test('defaults user config home to ~/.openclaude', async () => {
+describe('IceCode paths', () => {
+  test('defaults user config home to ~/.IceCode', async () => {
     delete process.env.CLAUDE_CONFIG_DIR
     const { resolveClaudeConfigHomeDir } = await importFreshEnvUtils()
 
     expect(
       resolveClaudeConfigHomeDir({
         homeDir: homedir(),
-        openClaudeExists: true,
+        IceCodeExists: true,
         legacyClaudeExists: false,
       }),
-    ).toBe(join(homedir(), '.openclaude'))
+    ).toBe(join(homedir(), '.IceCode'))
   })
 
-  test('falls back to ~/.claude when legacy config exists and ~/.openclaude does not', async () => {
+  test('falls back to ~/.claude when legacy config exists and ~/.IceCode does not', async () => {
     delete process.env.CLAUDE_CONFIG_DIR
     const { resolveClaudeConfigHomeDir } = await importFreshEnvUtils()
 
     expect(
       resolveClaudeConfigHomeDir({
         homeDir: homedir(),
-        openClaudeExists: false,
+        IceCodeExists: false,
         legacyClaudeExists: true,
       }),
     ).toBe(join(homedir(), '.claude'))
   })
 
-  test('default plans directory uses ~/.openclaude/plans', async () => {
+  test('default plans directory uses ~/.IceCode/plans', async () => {
     delete process.env.CLAUDE_CONFIG_DIR
     const { getDefaultPlansDirectory } = await importFreshPlans()
 
     expect(getDefaultPlansDirectory({ homeDir: homedir() })).toBe(
-      join(homedir(), '.openclaude', 'plans'),
+      join(homedir(), '.IceCode', 'plans'),
     )
   })
 
@@ -68,8 +68,8 @@ describe('OpenClaude paths', () => {
     const { getDefaultPlansDirectory } = await importFreshPlans()
 
     expect(
-      getDefaultPlansDirectory({ configDirEnv: '/tmp/custom-openclaude' }),
-    ).toBe(join('/tmp/custom-openclaude', 'plans'))
+      getDefaultPlansDirectory({ configDirEnv: '/tmp/custom-IceCode' }),
+    ).toBe(join('/tmp/custom-IceCode', 'plans'))
   })
 
   test('default plans directory normalizes generated path to NFC', async () => {
@@ -77,59 +77,59 @@ describe('OpenClaude paths', () => {
 
     expect(
       getDefaultPlansDirectory({ homeDir: '/tmp/cafe\u0301' }),
-    ).toBe(join('/tmp/caf\u00e9', '.openclaude', 'plans'))
+    ).toBe(join('/tmp/caf\u00e9', '.IceCode', 'plans'))
   })
 
   test('default plans directory normalizes explicit CLAUDE_CONFIG_DIR to NFC', async () => {
     const { getDefaultPlansDirectory } = await importFreshPlans()
 
     expect(
-      getDefaultPlansDirectory({ configDirEnv: '/tmp/cafe\u0301-openclaude' }),
-    ).toBe(join('/tmp/caf\u00e9-openclaude', 'plans'))
+      getDefaultPlansDirectory({ configDirEnv: '/tmp/cafe\u0301-IceCode' }),
+    ).toBe(join('/tmp/caf\u00e9-IceCode', 'plans'))
   })
 
   test('uses CLAUDE_CONFIG_DIR override when provided', async () => {
-    process.env.CLAUDE_CONFIG_DIR = '/tmp/custom-openclaude'
+    process.env.CLAUDE_CONFIG_DIR = '/tmp/custom-IceCode'
     const { getClaudeConfigHomeDir, resolveClaudeConfigHomeDir } =
       await importFreshEnvUtils()
 
-    expect(getClaudeConfigHomeDir()).toBe('/tmp/custom-openclaude')
+    expect(getClaudeConfigHomeDir()).toBe('/tmp/custom-IceCode')
     expect(
       resolveClaudeConfigHomeDir({
-        configDirEnv: '/tmp/custom-openclaude',
+        configDirEnv: '/tmp/custom-IceCode',
       }),
-    ).toBe('/tmp/custom-openclaude')
+    ).toBe('/tmp/custom-IceCode')
   })
 
-  test('project and local settings paths use .openclaude', async () => {
+  test('project and local settings paths use .IceCode', async () => {
     const { getRelativeSettingsFilePathForSource } = await importFreshSettings()
 
     expect(getRelativeSettingsFilePathForSource('projectSettings')).toBe(
-      '.openclaude/settings.json',
+      '.IceCode/settings.json',
     )
     expect(getRelativeSettingsFilePathForSource('localSettings')).toBe(
-      '.openclaude/settings.local.json',
+      '.IceCode/settings.local.json',
     )
   })
 
-  test('local installer uses openclaude wrapper path', async () => {
-    // Force .openclaude config home so the test doesn't fall back to
-    // ~/.claude when ~/.openclaude doesn't exist on this machine.
-    process.env.CLAUDE_CONFIG_DIR = join(homedir(), '.openclaude')
+  test('local installer uses IceCode wrapper path', async () => {
+    // Force .IceCode config home so the test doesn't fall back to
+    // ~/.claude when ~/.IceCode doesn't exist on this machine.
+    process.env.CLAUDE_CONFIG_DIR = join(homedir(), '.IceCode')
     const { getLocalClaudePath } = await importFreshLocalInstaller()
 
     expect(getLocalClaudePath()).toBe(
-      join(homedir(), '.openclaude', 'local', 'openclaude'),
+      join(homedir(), '.IceCode', 'local', 'IceCode'),
     )
   })
 
-  test('local installation detection matches .openclaude path', async () => {
+  test('local installation detection matches .IceCode path', async () => {
     const { isManagedLocalInstallationPath } =
       await importFreshLocalInstaller()
 
     expect(
       isManagedLocalInstallationPath(
-        `${join(homedir(), '.openclaude', 'local')}/node_modules/.bin/openclaude`,
+        `${join(homedir(), '.IceCode', 'local')}/node_modules/.bin/IceCode`,
       ),
     ).toBe(true)
   })
@@ -140,21 +140,21 @@ describe('OpenClaude paths', () => {
 
     expect(
       isManagedLocalInstallationPath(
-        `${join(homedir(), '.claude', 'local')}/node_modules/.bin/openclaude`,
+        `${join(homedir(), '.claude', 'local')}/node_modules/.bin/IceCode`,
       ),
     ).toBe(true)
   })
 
-  test('candidate local install dirs include both openclaude and legacy claude paths', async () => {
+  test('candidate local install dirs include both IceCode and legacy claude paths', async () => {
     const { getCandidateLocalInstallDirs } = await importFreshLocalInstaller()
 
     expect(
       getCandidateLocalInstallDirs({
-        configHomeDir: join(homedir(), '.openclaude'),
+        configHomeDir: join(homedir(), '.IceCode'),
         homeDir: homedir(),
       }),
     ).toEqual([
-      join(homedir(), '.openclaude', 'local'),
+      join(homedir(), '.IceCode', 'local'),
       join(homedir(), '.claude', 'local'),
     ])
   })

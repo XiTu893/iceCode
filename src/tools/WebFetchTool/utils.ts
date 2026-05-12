@@ -1,4 +1,4 @@
-import axios, { type AxiosResponse } from 'axios'
+﻿import axios, { type AxiosResponse } from 'axios'
 import { LRUCache } from 'lru-cache'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -22,7 +22,7 @@ import { makeSecondaryModelPrompt } from './prompt.js'
 // Custom error classes for domain blocking
 class DomainBlockedError extends Error {
   constructor(domain: string) {
-    super(`OpenClaude is unable to fetch from ${domain}`)
+    super(`IceCode is unable to fetch from ${domain}`)
     this.name = 'DomainBlockedError'
   }
 }

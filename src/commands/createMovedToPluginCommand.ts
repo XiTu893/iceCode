@@ -1,4 +1,4 @@
-import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.js'
+﻿import type { ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.js'
 import type { Command } from '../commands.js'
 import type { ToolUseContext } from '../Tool.js'
 
@@ -48,7 +48,7 @@ export function createMovedToPluginCommand({
             text: `This command has been moved to a plugin. Tell the user:
 
 1. To install the plugin, run:
-   openclaude plugin install ${pluginName}@claude-code-marketplace
+   IceCode plugin install ${pluginName}@claude-code-marketplace
 
 2. After installation, use /${pluginName}:${pluginCommand} to run this command
 

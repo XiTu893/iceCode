@@ -1,4 +1,4 @@
-/**
+﻿/**
  * MDM (Mobile Device Management) profile enforcement for Claude Code managed settings.
  *
  * Reads enterprise settings from OS-level MDM configuration:
@@ -60,7 +60,7 @@ type MdmRuntimeState = {
 
 function getMdmRuntimeState(): MdmRuntimeState {
   const globalStore = globalThis as Record<string, unknown>
-  const key = '__openclaudeMdmRuntimeState'
+  const key = '__IceCodeMdmRuntimeState'
   const existing = globalStore[key]
   if (existing && typeof existing === 'object') {
     return existing as MdmRuntimeState

@@ -1,4 +1,4 @@
-/* eslint-disable custom-rules/no-process-exit -- CLI subcommand handler intentionally exits */
+﻿/* eslint-disable custom-rules/no-process-exit -- CLI subcommand handler intentionally exits */
 
 import {
   clearAuthRelatedCaches,
@@ -287,7 +287,7 @@ export async function authStatus(opts: {
     }
     if (!loggedIn) {
       process.stdout.write(
-        'Not logged in. Run openclaude auth login to authenticate.\n',
+        'Not logged in. Run IceCode auth login to authenticate.\n',
       )
     }
   } else {

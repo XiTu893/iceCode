@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Feishu Channel configuration management.
  *
  * Reads Feishu app credentials from environment variables or settings
@@ -30,7 +30,7 @@ export function resolveFeishuConfig(overrides?: Partial<FeishuConfig>): FeishuCo
     webhookPath: overrides?.webhookPath ?? process.env[`${ENV_PREFIX}WEBHOOK_PATH`] ?? '/feishu/events',
     allowedUsers: overrides?.allowedUsers ?? parseListEnv(`${ENV_PREFIX}ALLOWED_USERS`),
     allowedGroups: overrides?.allowedGroups ?? parseListEnv(`${ENV_PREFIX}ALLOWED_GROUPS`),
-    botName: overrides?.botName ?? process.env[`${ENV_PREFIX}BOT_NAME`] ?? 'OpenClaude',
+    botName: overrides?.botName ?? process.env[`${ENV_PREFIX}BOT_NAME`] ?? 'IceCode',
   }
 }
 

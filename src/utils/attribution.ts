@@ -90,11 +90,11 @@ export function getDefaultCommitCoAuthorName({
   }
 
   const sanitizedModel = sanitizeCoAuthorNamePart(model)
-  return sanitizedModel ? `OpenClaude (${sanitizedModel})` : 'OpenClaude'
+  return sanitizedModel ? `IceCode (${sanitizedModel})` : 'IceCode'
 }
 
 export function getDefaultCommitCoAuthorEmail(_apiProvider: string): string {
-  return 'openclaude@gitlawb.com'
+  return 'icecode@xitu893.com'
 }
 
 /**
@@ -133,10 +133,10 @@ export function getAttributionTexts(): AttributionTexts {
     isInternalRepo: isInternalModelRepoCached(),
   })
   const defaultAttribution =
-    '🤖 Generated with [OpenClaude](https://github.com/Gitlawb/openclaude)'
+    '🤖 Generated with [IceCode](https://github.com/XiTu893/iceIDE)'
   const coAuthorEmail = getDefaultCommitCoAuthorEmail(apiProvider)
   const defaultCommit = isEnvTruthy(
-    process.env.OPENCLAUDE_DISABLE_CO_AUTHORED_BY,
+    process.env.ICECODE_DISABLE_CO_AUTHORED_BY,
   )
     ? ''
     : `Co-Authored-By: ${modelName} <${coAuthorEmail}>`
@@ -388,7 +388,7 @@ export async function getEnhancedPRAttribution(
   }
 
   const defaultAttribution =
-    '🤖 Generated with [OpenClaude](https://github.com/Gitlawb/openclaude)'
+    '🤖 Generated with [IceCode](https://github.com/XiTu893/iceIDE)'
 
   // Get AppState first
   const appState = getAppState()
@@ -434,7 +434,7 @@ export async function getEnhancedPRAttribution(
     memoryAccessCount > 0
       ? `, ${memoryAccessCount} ${memoryAccessCount === 1 ? 'memory' : 'memories'} recalled`
       : ''
-  const summary = `🤖 Generated with [OpenClaude](https://github.com/Gitlawb/openclaude) (${claudePercent}% ${promptCount}-shotted by ${shortModelName}${memSuffix})`
+  const summary = `🤖 Generated with [IceCode](https://github.com/XiTu893/iceIDE) (${claudePercent}% ${promptCount}-shotted by ${shortModelName}${memSuffix})`
 
   // Append trailer lines for squash-merge survival. Only for allowlisted repos
   // (INTERNAL_MODEL_REPOS) and only in builds with COMMIT_ATTRIBUTION enabled —

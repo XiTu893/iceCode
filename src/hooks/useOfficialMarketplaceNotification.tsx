@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import type { Notification } from '../context/notifications.js';
 import { Text } from '../ink.js';
 import { logForDebugging } from '../utils/debug.js';
@@ -19,7 +19,7 @@ async function _temp() {
     logForDebugging("Showing marketplace config save failure notification");
     notifs.push({
       key: "marketplace-config-save-failed",
-      jsx: <Text color="error">Failed to save marketplace retry info · Check ~/.openclaude.json permissions</Text>,
+      jsx: <Text color="error">Failed to save marketplace retry info · Check ~/.IceCode.json permissions</Text>,
       priority: "immediate",
       timeoutMs: 10000
     });

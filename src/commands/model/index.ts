@@ -1,4 +1,4 @@
-import type { Command } from '../../commands.js'
+﻿import type { Command } from '../../commands.js'
 import { shouldInferenceConfigCommandBeImmediate } from '../../utils/immediateCommand.js'
 import { getMainLoopModel, renderModelName } from '../../utils/model/model.js'
 
@@ -6,7 +6,7 @@ export default {
   type: 'local-jsx',
   name: 'model',
   get description() {
-    return `Set the AI model for OpenClaude (currently ${renderModelName(getMainLoopModel())})`
+    return `Set the AI model for IceCode (currently ${renderModelName(getMainLoopModel())})`
   },
   argumentHint: '[model]',
   get immediate() {

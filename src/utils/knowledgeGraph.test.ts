@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, afterEach, afterAll } from 'bun:test'
+﻿import { describe, expect, it, beforeEach, afterEach, afterAll } from 'bun:test'
 import {
   addGlobalEntity,
   addGlobalRelation,
@@ -19,7 +19,7 @@ import { getProjectsDir } from './envUtils.js'
 
 describe('KnowledgeGraph Global Persistence & RAG', () => {
   const originalConfigDir = process.env.CLAUDE_CONFIG_DIR
-  const configDir = mkdtempSync(join(tmpdir(), 'openclaude-knowledge-graph-'))
+  const configDir = mkdtempSync(join(tmpdir(), 'IceCode-knowledge-graph-'))
   process.env.CLAUDE_CONFIG_DIR = configDir
   const cwd = getFsImplementation().cwd()
   const graphPath = getProjectGraphPath(cwd)
@@ -67,19 +67,19 @@ describe('KnowledgeGraph Global Persistence & RAG', () => {
   })
 
   it('deduplicates entities and updates attributes', async () => {
-    await addGlobalEntity('tool', 'openclaude', { status: 'alpha' })
-    await addGlobalEntity('tool', 'openclaude', { status: 'beta', version: '0.6.0' })
+    await addGlobalEntity('tool', 'IceCode', { status: 'alpha' })
+    await addGlobalEntity('tool', 'IceCode', { status: 'beta', version: '0.6.0' })
 
     const graph = loadProjectGraph(cwd)
-    const entities = Object.values(graph.entities).filter(e => e.name === 'openclaude')
+    const entities = Object.values(graph.entities).filter(e => e.name === 'IceCode')
     expect(entities.length).toBe(1)
     expect(entities[0].attributes.status).toBe('beta')
     expect(entities[0].attributes.version).toBe('0.6.0')
   })
 
   it('clears Orama database and persistence file on resetGlobalGraph', async () => {
-    const originalOrama = process.env.OPENCLAUDE_KNOWLEDGE_ORAMA
-    process.env.OPENCLAUDE_KNOWLEDGE_ORAMA = '1'
+    const originalOrama = process.env.IceCode_KNOWLEDGE_ORAMA
+    process.env.IceCode_KNOWLEDGE_ORAMA = '1'
     const { initOrama, getOramaPersistencePath } = await import('./knowledgeGraph.js')
 
     await initOrama(cwd)
@@ -93,15 +93,15 @@ describe('KnowledgeGraph Global Persistence & RAG', () => {
 
     // Cleanup env
     if (originalOrama === undefined) {
-      delete process.env.OPENCLAUDE_KNOWLEDGE_ORAMA
+      delete process.env.IceCode_KNOWLEDGE_ORAMA
     } else {
-      process.env.OPENCLAUDE_KNOWLEDGE_ORAMA = originalOrama
+      process.env.IceCode_KNOWLEDGE_ORAMA = originalOrama
     }
   })
 
-  describe('Feature Flag: OPENCLAUDE_KNOWLEDGE_ORAMA', () => {
+  describe('Feature Flag: IceCode_KNOWLEDGE_ORAMA', () => {
     it('uses Orama when flag is enabled', async () => {
-      process.env.OPENCLAUDE_KNOWLEDGE_ORAMA = '1'
+      process.env.IceCode_KNOWLEDGE_ORAMA = '1'
       const oramaPath = join(getProjectsDir(), sanitizePath(cwd), 'knowledge.orama')
 
       await addGlobalEntity('test', 'orama-active', { val: 'yes' })
@@ -111,11 +111,11 @@ describe('KnowledgeGraph Global Persistence & RAG', () => {
       expect(result).toContain('ORAMA RAG')
       expect(result).toContain('orama-active')
 
-      delete process.env.OPENCLAUDE_KNOWLEDGE_ORAMA
+      delete process.env.IceCode_KNOWLEDGE_ORAMA
     })
 
     it('restores Orama from persistence file', async () => {
-      process.env.OPENCLAUDE_KNOWLEDGE_ORAMA = '1'
+      process.env.IceCode_KNOWLEDGE_ORAMA = '1'
 
       // First run: add and save
       await addGlobalEntity('test', 'persistent-orama', { data: '42' })
@@ -126,11 +126,11 @@ describe('KnowledgeGraph Global Persistence & RAG', () => {
       expect(result).toContain('ORAMA RAG')
       expect(result).toContain('persistent-orama')
 
-      delete process.env.OPENCLAUDE_KNOWLEDGE_ORAMA
+      delete process.env.IceCode_KNOWLEDGE_ORAMA
     })
 
     it('stays on JSON path when flag is disabled', async () => {
-      delete process.env.OPENCLAUDE_KNOWLEDGE_ORAMA
+      delete process.env.IceCode_KNOWLEDGE_ORAMA
       const oramaPath = join(getProjectsDir(), sanitizePath(cwd), 'knowledge.orama')
 
       // Ensure clean state: remove orama file if it exists from previous tests

@@ -1,4 +1,4 @@
-import figures from 'figures';
+﻿import figures from 'figures';
 import React, { useEffect, useRef, useState } from 'react';
 import { type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS, logEvent } from 'src/services/analytics/index.js';
 import type { CommandResultDisplay } from '../../commands.js';
@@ -102,9 +102,9 @@ export function MCPRemoteServerMenu({
       if (success) {
         onComplete?.(`Authentication successful. Connected to ${server.name}.`);
       } else if (result.client.type === 'needs-auth') {
-        onComplete?.('Authentication successful, but server still requires authentication. You may need to manually restart OpenClaude.');
+        onComplete?.('Authentication successful, but server still requires authentication. You may need to manually restart IceCode.');
       } else {
-        onComplete?.('Authentication successful, but server reconnection failed. You may need to manually restart OpenClaude for the changes to take effect.');
+        onComplete?.('Authentication successful, but server reconnection failed. You may need to manually restart IceCode for the changes to take effect.');
       }
     } catch (err) {
       logEvent('tengu_claudeai_mcp_auth_completed', {
@@ -281,11 +281,11 @@ export function MCPRemoteServerMenu({
           const message = isEffectivelyAuthenticated ? `Authentication successful. Reconnected to ${server.name}.` : `Authentication successful. Connected to ${server.name}.`;
           onComplete?.(message);
         } else if (result_0.client.type === 'needs-auth') {
-          onComplete?.('Authentication successful, but server still requires authentication. You may need to manually restart OpenClaude.');
+          onComplete?.('Authentication successful, but server still requires authentication. You may need to manually restart IceCode.');
         } else {
           // result.client.type === 'failed'
           logMCPDebug(server.name, `Reconnection failed after authentication`);
-          onComplete?.('Authentication successful, but server reconnection failed. You may need to manually restart OpenClaude for the changes to take effect.');
+          onComplete?.('Authentication successful, but server reconnection failed. You may need to manually restart IceCode for the changes to take effect.');
         }
       }
     } catch (err_1) {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Color palettes for the startup splash logo.
  * Selected via /logo, persisted in GlobalConfig.logoColor.
  */
@@ -12,7 +12,7 @@ export type LogoPalette = {
   accent: RGB
   /** Soft body text color (tagline value, label values). */
   cream: RGB
-  /** Dim color for label names and the openclaude prefix. */
+  /** Dim color for label names and the IceCode prefix. */
   dim: RGB
   /** Box-drawing border color. */
   border: RGB

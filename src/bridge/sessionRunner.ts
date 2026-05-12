@@ -1,4 +1,4 @@
-import { type ChildProcess, spawn } from 'child_process'
+﻿import { type ChildProcess, spawn } from 'child_process'
 import { createWriteStream, type WriteStream } from 'fs'
 import { tmpdir } from 'os'
 import { dirname, join } from 'path'
@@ -30,7 +30,7 @@ const CHILD_ENV_ALLOWLIST = new Set([
   'LANG', 'LC_ALL', 'LC_CTYPE',
   // Node.js runtime
   'NODE_OPTIONS', 'NODE_PATH', 'NODE_ENV',
-  // OpenClaude session / bridge (non-secret)
+  // IceCode session / bridge (non-secret)
   'CLAUDE_CODE_ENVIRONMENT_KIND',
   'CLAUDE_CODE_FORCE_SANDBOX',
   'CLAUDE_CODE_BUBBLEWRAP',

@@ -1,4 +1,4 @@
-import { feature } from 'bun:bundle';
+﻿import { feature } from 'bun:bundle';
 import chalk from 'chalk';
 import * as path from 'path';
 import * as React from 'react';
@@ -773,7 +773,7 @@ function PromptInput({
     if (feature('ULTRAPLAN') && ultraplanTriggers.length) {
       addNotification({
         key: 'ultraplan-active',
-        text: 'This prompt will launch an ultraplan session in OpenClaude on the web',
+        text: 'This prompt will launch an ultraplan session in IceCode on the web',
         priority: 'immediate',
         timeoutMs: 5000
       });
