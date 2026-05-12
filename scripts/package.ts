@@ -160,7 +160,7 @@ async function buildElectronMain() {
  * 复制必要的资源文件
  */
 async function copyResources() {
-  logStep(6, '复制资源文件')
+  logStep(6, '复制资源文件和运行时')
   
   const resourcesDir = path.join(IDE_DIR, 'resources')
   
@@ -169,7 +169,7 @@ async function copyResources() {
     fs.mkdirSync(resourcesDir, { recursive: true })
   }
   
-  // 复制CLI构建产物到IDE资源目录
+  // 1. 复制CLI构建产物到IDE资源目录
   const cliDest = path.join(resourcesDir, 'cli')
   if (!fs.existsSync(cliDest)) {
     fs.mkdirSync(cliDest, { recursive: true })
@@ -179,7 +179,49 @@ async function copyResources() {
   await $`cp -r ${path.join(ROOT_DIR, 'dist')}/* ${cliDest}/`
   logSuccess('CLI构建产物复制完成')
   
-  // 复制必要的配置文件
+  // 2. 复制CLI的node_modules（生产依赖）
+  log('复制CLI依赖包...')
+  const cliNodeModules = path.join(cliDest, 'node_modules')
+  if (!fs.existsSync(cliNodeModules)) {
+    fs.mkdirSync(cliNodeModules, { recursive: true })
+  }
+  
+  // 只复制必要的生产依赖
+  const essentialPackages = [
+    '@grpc/grpc-js',
+    '@grpc/proto-loader',
+    'openai',
+    'anthropic',
+    '@google/generative-ai',
+    'axios',
+    'zod',
+    'chalk',
+    'commander',
+    'ora',
+    'ink',
+    'react',
+    'react-dom',
+  ]
+  
+  const rootModules = path.join(ROOT_DIR, 'node_modules')
+  for (const pkg of essentialPackages) {
+    const srcPkg = path.join(rootModules, pkg)
+    const destPkg = path.join(cliNodeModules, pkg)
+    if (fs.existsSync(srcPkg)) {
+      await $`cp -r ${srcPkg} ${destPkg}`.quiet()
+      logSuccess(`复制依赖: ${pkg}`)
+    }
+  }
+  
+  // 3. 复制bin目录（CLI入口）
+  const binDest = path.join(cliDest, 'bin')
+  if (!fs.existsSync(binDest)) {
+    fs.mkdirSync(binDest, { recursive: true })
+  }
+  await $`cp ${path.join(ROOT_DIR, 'bin', 'icecode')} ${binDest}/`
+  logSuccess('复制CLI入口文件')
+  
+  // 4. 复制package.json和配置文件
   const configFiles = ['package.json', '.npmrc']
   for (const file of configFiles) {
     const src = path.join(ROOT_DIR, file)
@@ -189,6 +231,25 @@ async function copyResources() {
       logSuccess(`复制 ${file}`)
     }
   }
+  
+  // 5. 检测并提示Node.js运行时
+  log('\n检查Node.js运行时...', colors.yellow)
+  const nodePath = process.execPath
+  const nodeVersion = process.version
+  log(`当前Node.js: ${nodeVersion} (${nodePath})`)
+  logWarning('注意: Node.js运行时不会自动打包到安装包中')
+  logWarning('用户需要在系统中安装Node.js >= 22')
+  logWarning('或者可以手动将Node.js便携版放入 resources/node/ 目录')
+  
+  // 6. 创建启动脚本
+  const startScriptPath = path.join(resourcesDir, 'start-backend.sh')
+  const startScriptContent = `#!/bin/bash
+# IceCode Backend Starter
+cd "$(dirname "$0")/cli"
+node dist/cli.mjs grpc-server --port 50051
+`
+  fs.writeFileSync(startScriptPath, startScriptContent)
+  logSuccess('创建后端启动脚本')
 }
 
 /**
@@ -254,7 +315,7 @@ async function packageIDE() {
 function generateReport() {
   logStep(8, '生成打包报告')
   
-  const report = {
+  const report: any = {
     timestamp: new Date().toISOString(),
     platform: process.platform,
     arch: process.arch,
@@ -300,7 +361,8 @@ function generateReport() {
   log(`  Bun: ${report.bunVersion}`)
   log(`  生成包数: ${report.packages.length}`)
   if (report.packages.length > 0) {
-    log(`  总大小: ${report.packages.reduce((sum, p) => sum + parseFloat(p.sizeMB), 0).toFixed(2)} MB`)
+    const totalSize = report.packages.reduce((sum: number, p: any) => sum + parseFloat(p.sizeMB), 0)
+    log(`  总大小: ${totalSize.toFixed(2)} MB`)
   }
 }
 
