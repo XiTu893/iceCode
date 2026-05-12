@@ -1,0 +1,103 @@
+/* 骨架屏加载组件样式 */
+
+.skeleton-loader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-item {
+  background: linear-gradient(
+    90deg,
+    rgba(74, 74, 90, 0.3) 25%,
+    rgba(90, 90, 110, 0.5) 50%,
+    rgba(74, 74, 90, 0.3) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: 4px;
+}
+
+/* 动画效果 */
+.skeleton-item.animated {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 不同类型样式 */
+.skeleton-text {
+  border-radius: 3px;
+}
+
+.skeleton-title {
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.skeleton-paragraph {
+  border-radius: 4px;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+.skeleton-rect {
+  border-radius: 6px;
+}
+
+.skeleton-list {
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.skeleton-card {
+  border-radius: 8px;
+}
+
+/* 预设组合 */
+.skeleton-preset {
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.skeleton-preset.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  padding: 0;
+  background: transparent;
+}
+
+.skeleton-preset.avatar-list {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.avatar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .skeleton-preset.card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-preset.avatar-list {
+    flex-wrap: wrap;
+  }
+}

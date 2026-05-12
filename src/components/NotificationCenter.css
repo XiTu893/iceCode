@@ -1,0 +1,332 @@
+/* 通知中心组件样式 */
+
+.notification-center {
+  background: rgba(25, 25, 35, 0.95);
+  border: 1px solid #3a3a4a;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  color: #e0e0e0;
+  transition: all 0.3s ease;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-center.collapsed {
+  padding: 8px 12px;
+  max-height: 50px;
+}
+
+/* 标题栏 */
+.notification-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #3a3a4a;
+  margin-bottom: 8px;
+  user-select: none;
+}
+
+.notification-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.notification-header .title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.unread-badge {
+  background: #f87171;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.notification-header .toggle-icon {
+  margin-left: auto;
+  font-size: 10px;
+  color: #666;
+}
+
+/* 内容区域 */
+.notification-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 过滤器 */
+.notification-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-button {
+  padding: 4px 10px;
+  background: rgba(74, 74, 90, 0.3);
+  border: 1px solid #4a4a5a;
+  border-radius: 4px;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  background: rgba(74, 74, 90, 0.5);
+  color: #e0e0e0;
+}
+
+.filter-button.active {
+  background: rgba(96, 165, 250, 0.3);
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
+/* 通知列表 */
+.notification-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-state .empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* 通知项 */
+.notification-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid #3a3a4a;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.notification-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #5a5a6a;
+}
+
+.notification-item.unread {
+  border-left: 3px solid #60a5fa;
+  background: rgba(96, 165, 250, 0.05);
+}
+
+.notification-item.read {
+  opacity: 0.7;
+}
+
+/* 不同类型样式 */
+.notification-item.success {
+  border-left-color: #4ade80;
+}
+
+.notification-item.error {
+  border-left-color: #f87171;
+}
+
+.notification-item.warning {
+  border-left-color: #fbbf24;
+}
+
+.notification-item.info {
+  border-left-color: #60a5fa;
+}
+
+/* 图标 */
+.notification-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+/* 内容 */
+.notification-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #e0e0e0;
+}
+
+.notification-message {
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: #666;
+}
+
+/* 操作按钮 */
+.notification-actions {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.action-button {
+  padding: 4px 8px;
+  background: rgba(96, 165, 250, 0.2);
+  border: 1px solid #60a5fa;
+  border-radius: 4px;
+  color: #60a5fa;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  background: rgba(96, 165, 250, 0.3);
+}
+
+.delete-button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid #4a4a5a;
+  border-radius: 4px;
+  color: #888;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-button:hover {
+  background: rgba(248, 113, 113, 0.2);
+  border-color: #f87171;
+  color: #f87171;
+}
+
+/* 底部操作 */
+.notification-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #3a3a4a;
+  text-align: center;
+}
+
+.clear-button {
+  padding: 6px 16px;
+  background: rgba(248, 113, 113, 0.2);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  border-radius: 4px;
+  color: #f87171;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-button:hover {
+  background: rgba(248, 113, 113, 0.3);
+}
+
+/* 滚动条样式 */
+.notification-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+  background: #4a4a5a;
+  border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover {
+  background: #5a5a6a;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .notification-center {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .notification-filters {
+    gap: 4px;
+  }
+
+  .filter-button {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .notification-item {
+    padding: 8px;
+  }
+
+  .notification-icon {
+    font-size: 18px;
+  }
+
+  .notification-actions {
+    flex-direction: column;
+  }
+}
