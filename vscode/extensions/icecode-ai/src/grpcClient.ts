@@ -242,6 +242,65 @@ export class GrpcClient {
         }
     }
 
+    async requestCompletion(prompt: string, languageId: string): Promise<string | null> {
+        const config = vscode.workspace.getConfiguration('icecode-ai');
+        const model = config.get<string>('model', 'claude-sonnet-4-20250514');
+
+        if (!this._connected) {
+            return this._simulateCompletion(prompt, languageId);
+        }
+
+        try {
+            const response = await fetch(`http://${this._backendUrl}/v1/completion`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    prompt,
+                    language: languageId,
+                    model,
+                    max_tokens: 200,
+                    temperature: 0.1,
+                    stream: false
+                })
+            });
+
+            if (!response.ok) {
+                return null;
+            }
+
+            const data = await response.json() as any;
+            return data.content || data.completion || null;
+        } catch {
+            return this._simulateCompletion(prompt, languageId);
+        }
+    }
+
+    private _simulateCompletion(prompt: string, languageId: string): string | null {
+        const lines = prompt.split('\n');
+        const lastLine = lines[lines.length - 2] || '';
+        const trimmed = lastLine.trim();
+
+        if (trimmed.endsWith('{')) return '\n\t\n}';
+        if (trimmed.endsWith('(')) return '\n\t\n)';
+        if (trimmed.endsWith('[')) return '\n\t\n]';
+        if (trimmed.endsWith('=>')) return ' {\n\t\n}';
+        if (trimmed.endsWith(':')) return ' null;';
+        if (trimmed.endsWith('return')) return ' null;';
+
+        if (languageId === 'python') {
+            if (trimmed.endsWith(':')) return '\n    pass';
+            if (trimmed.startsWith('def ')) return ':\n    pass';
+            if (trimmed.startsWith('class ')) return ':\n    pass';
+        }
+
+        if (languageId === 'typescript' || languageId === 'javascript') {
+            if (trimmed.startsWith('function ')) return ' {\n\t\n}';
+            if (trimmed.startsWith('const ') || trimmed.startsWith('let ')) return ' = ;';
+        }
+
+        return null;
+    }
+
     private _simulateResponse(message: string): string {
         return `I received your message: "${message}"\n\nThe IceCode AI backend is not currently connected. To enable full AI capabilities:\n\n1. Start the Claude Code backend\n2. Configure the backend URL in settings\n3. Restart IceCode IDE\n\nFor now, I'm running in simulation mode.`;
     }

@@ -2,7 +2,7 @@
   "name": "icecode-ai",
   "displayName": "IceCode AI",
   "description": "IceCode AI Assistant - Powered by Claude Code",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "icecode",
   "engines": {
     "vscode": "^1.90.0"
@@ -58,6 +58,38 @@
       {
         "command": "icecode-ai.toggleSidePanel",
         "title": "IceCode AI: Toggle Side Panel"
+      },
+      {
+        "command": "icecode-ai.explainCode",
+        "title": "IceCode AI: Explain Code"
+      },
+      {
+        "command": "icecode-ai.fixCode",
+        "title": "IceCode AI: Fix Code"
+      },
+      {
+        "command": "icecode-ai.optimizeCode",
+        "title": "IceCode AI: Optimize Code"
+      },
+      {
+        "command": "icecode-ai.addTests",
+        "title": "IceCode AI: Generate Tests"
+      },
+      {
+        "command": "icecode-ai.addDocs",
+        "title": "IceCode AI: Add Documentation"
+      },
+      {
+        "command": "icecode-ai.refactorCode",
+        "title": "IceCode AI: Refactor Code"
+      },
+      {
+        "command": "icecode-ai.switchModel",
+        "title": "IceCode AI: Switch Model"
+      },
+      {
+        "command": "icecode-ai.toggleInlineCompletion",
+        "title": "IceCode AI: Toggle Inline Completion"
       }
     ],
     "keybindings": [
@@ -70,6 +102,21 @@
         "command": "icecode-ai.newSession",
         "key": "ctrl+shift+alt+n",
         "mac": "cmd+shift+alt+n"
+      },
+      {
+        "command": "icecode-ai.explainCode",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e"
+      },
+      {
+        "command": "icecode-ai.fixCode",
+        "key": "ctrl+shift+f",
+        "mac": "cmd+shift+f"
+      },
+      {
+        "command": "icecode-ai.toggleInlineCompletion",
+        "key": "ctrl+alt+space",
+        "mac": "cmd+alt+space"
       }
     ],
     "configuration": {
@@ -86,17 +133,21 @@
           "enum": [
             "claude-sonnet-4-20250514",
             "claude-opus-4-20250514",
-            "claude-haiku-3-5-20241022"
+            "claude-haiku-3-5-20241022",
+            "gpt-4o",
+            "gpt-4o-mini",
+            "gemini-2.5-pro",
+            "deepseek-chat",
+            "deepseek-coder",
+            "ollama:codellama",
+            "ollama:deepseek-coder"
           ],
           "description": "AI model to use"
         },
         "icecode-ai.theme": {
           "type": "string",
           "default": "dark",
-          "enum": [
-            "dark",
-            "light"
-          ],
+          "enum": ["dark", "light"],
           "description": "Chat panel theme"
         },
         "icecode-ai.fontSize": {
@@ -108,6 +159,37 @@
           "type": "boolean",
           "default": true,
           "description": "Auto-start backend on IDE launch"
+        },
+        "icecode-ai.inlineCompletionEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI inline code completion"
+        },
+        "icecode-ai.inlineCompletionDelay": {
+          "type": "number",
+          "default": 300,
+          "description": "Delay in ms before triggering inline completion"
+        },
+        "icecode-ai.inlineCompletionProvider": {
+          "type": "string",
+          "default": "auto",
+          "enum": ["auto", "icecode", "disabled"],
+          "description": "Inline completion provider"
+        },
+        "icecode-ai.contextLines": {
+          "type": "number",
+          "default": 50,
+          "description": "Number of context lines to send with code actions"
+        },
+        "icecode-ai.saveHistory": {
+          "type": "boolean",
+          "default": true,
+          "description": "Save chat history between sessions"
+        },
+        "icecode-ai.maxHistoryItems": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum number of history items to save"
         }
       }
     },
@@ -117,6 +199,36 @@
           "command": "icecode-ai.sendToChat",
           "when": "editorHasSelection",
           "group": "icecode@1"
+        },
+        {
+          "command": "icecode-ai.explainCode",
+          "when": "editorHasSelection",
+          "group": "icecode@2"
+        },
+        {
+          "command": "icecode-ai.fixCode",
+          "when": "editorHasSelection",
+          "group": "icecode@3"
+        },
+        {
+          "command": "icecode-ai.optimizeCode",
+          "when": "editorHasSelection",
+          "group": "icecode@4"
+        },
+        {
+          "command": "icecode-ai.addTests",
+          "when": "editorHasSelection",
+          "group": "icecode@5"
+        },
+        {
+          "command": "icecode-ai.addDocs",
+          "when": "editorHasSelection",
+          "group": "icecode@6"
+        },
+        {
+          "command": "icecode-ai.refactorCode",
+          "when": "editorHasSelection",
+          "group": "icecode@7"
         }
       ]
     },
@@ -144,7 +256,7 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --target=node20",
-    "watch": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --target=node20 --watch --sourcemap"
+    "watch": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node20 --watch --sourcemap"
   },
   "devDependencies": {
     "@types/vscode": "^1.90.0",
