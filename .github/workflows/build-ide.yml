@@ -1,4 +1,4 @@
-name: Build and Release IDE
+name: Build IDE Portable
 
 on:
   push:
@@ -7,90 +7,179 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to build (e.g., 0.9.3)'
+        description: 'Version (e.g. 1.0.1)'
         required: false
         type: string
 
+concurrency:
+  group: build-ide-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
-    name: Build IDE on ${{ matrix.os }}
+    name: Build ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
-    
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-        
+        include:
+          - os: windows-latest
+            platform: win-x64
+            ext: .zip
+            bun_ext: .zip
+          - os: macos-latest
+            platform: darwin-arm64
+            ext: .dmg
+            bun_ext: .zip
+          - os: ubuntu-latest
+            platform: linux-x64
+            ext: .AppImage
+            bun_ext: .zip
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          
-      - name: Install dependencies
+
+      - name: Install root dependencies
+        run: bun install
+
+      - name: Build CLI backend
+        run: bun run build
+
+      - name: Download portable Bun for bundling
+        shell: bash
+        run: |
+          mkdir -p build/backend
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            BUN_URL="https://github.com/oven-sh/bun/releases/latest/download/bun-windows-x64.zip"
+            curl -fsSL "$BUN_URL" -o bun-portable.zip
+            unzip -o bun-portable.zip -d build/backend/
+            mv build/backend/bun-windows-x64/bun.exe build/backend/bun.exe 2>/dev/null || true
+            ls -la build/backend/
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            BUN_URL="https://github.com/oven-sh/bun/releases/latest/download/bun-darwin-aarch64.zip"
+            curl -fsSL "$BUN_URL" -o bun-portable.zip
+            unzip -o bun-portable.zip -d build/backend/
+            chmod +x build/backend/bun-darwin-aarch64/bun 2>/dev/null || true
+            mv build/backend/bun-darwin-aarch64/bun build/backend/bun 2>/dev/null || true
+          else
+            BUN_URL="https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
+            curl -fsSL "$BUN_URL" -o bun-portable.zip
+            unzip -o bun-portable.zip -d build/backend/
+            chmod +x build/backend/bun-linux-x64/bun 2>/dev/null || true
+            mv build/backend/bun-linux-x64/bun build/backend/bun 2>/dev/null || true
+          fi
+          ls -la build/backend/
+
+      - name: Install IDE dependencies
         run: |
           cd ide
           bun install
-          
-      - name: Build CLI
-        run: bun run build
-        
-      - name: Build Electron app
+
+      - name: Build Vite frontend
         run: |
           cd ide
-          bun run electron:build
-          
-      - name: Package for Windows
+          bun run build
+
+      - name: Build Electron main process
+        run: |
+          cd ide
+          bun run build:electron
+
+      - name: Package Windows portable ZIP
         if: matrix.os == 'windows-latest'
         run: |
           cd ide
-          npx electron-builder --win --x64
-          
-      - name: Package for macOS
+          npx electron-builder --win zip --x64
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package macOS
         if: matrix.os == 'macos-latest'
         run: |
           cd ide
-          npx electron-builder --mac
-          
-      - name: Package for Linux
+          npx electron-builder --mac zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package Linux
         if: matrix.os == 'ubuntu-latest'
         run: |
           cd ide
-          npx electron-builder --linux
-          
-      - name: Upload artifacts
+          sudo apt-get install -y rpm
+          npx electron-builder --linux zip appimage
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: icecode-ide-${{ matrix.os }}
-          path: ide/release/*
-          retention-days: 30
-          
+          name: IceCode-IDE-${{ matrix.platform }}
+          path: |
+            ide/release/*.zip
+            ide/release/*.dmg
+            ide/release/*.AppImage
+            ide/release/*.exe
+          retention-days: 90
+
   release:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    
+    permissions:
+      contents: write
+
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f | head -50
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            **/*.exe
-            **/*.dmg
-            **/*.AppImage
-            **/*.deb
-            **/*.zip
+            artifacts/**/*.zip
+            artifacts/**/*.dmg
+            artifacts/**/*.AppImage
+            artifacts/**/*.exe
           generate_release_notes: true
+          body: |
+            ## IceCode IDE - Portable Release
+
+            ### Download & Run
+            1. Download the ZIP for your platform
+            2. Extract to any folder
+            3. Double-click `IceCode IDE.exe` (Windows) or run the app binary
+
+            **No Node.js, Bun, or any runtime installation required!**
+
+            The portable ZIP bundles:
+            - Electron app (IDE UI + Monaco Editor)
+            - Bun runtime (for AI backend)
+            - CLI backend (AI Agent with 20+ tools)
+            - gRPC server (auto-starts on launch)
+
+            ### Features
+            - AI-First IDE layout (Trae-style)
+            - Multi-LLM support (Claude/GPT/Gemini/DeepSeek/Ollama)
+            - Monaco Editor with Trae Dark theme
+            - Integrated terminal
+            - Git integration
+            - Slash commands & @ file mentions
+            - Artifact summary & diff preview
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

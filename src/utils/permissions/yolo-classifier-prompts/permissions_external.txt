@@ -1,0 +1,33 @@
+## User Allow Rules (actions that are safe)
+<user_allow_rules_to_replace>
+- Reading files within the project directory
+- Listing directory contents (ls, dir, Get-ChildItem)
+- Running tests and build commands (npm test, bun test, make)
+- Installing dependencies with package managers (npm install, bun install)
+- Viewing file metadata and git status
+- Searching code with grep or ripgrep
+- Opening files in the editor
+</user_allow_rules_to_replace>
+
+## User Deny Rules (actions that should be blocked)
+<user_deny_rules_to_replace>
+- Deleting files outside the project directory
+- Executing arbitrary shell commands without explicit user confirmation
+- Modifying system configuration files (/etc, registry, environment variables)
+- Accessing sensitive environment variables (passwords, API keys, tokens)
+- Network operations to unknown or untrusted hosts
+- Installing global packages or system-wide software
+- Modifying version control history (git reset --hard, git push --force)
+- Running commands with elevated privileges (sudo, RunAs)
+- Downloading and executing remote scripts (curl | bash, iex (iwr ...))
+- Irreversible file operations (rm -rf, Remove-Item -Recurse -Force)
+</user_deny_rules_to_replace>
+
+## Environment Context
+<user_environment_to_replace>
+- Project root: current working directory
+- Operating system: detected at runtime
+- Shell: PowerShell on Windows, bash/zsh on Unix
+- User has full control over project directory
+- System directories and other users' files are off-limits
+</user_environment_to_replace>

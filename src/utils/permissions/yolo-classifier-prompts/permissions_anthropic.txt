@@ -1,0 +1,29 @@
+## User Allow Rules (actions that are safe)
+<user_allow_rules_to_replace>
+</user_allow_rules_to_replace>
+
+- Reading files within the project directory
+- Listing directory contents
+- Running tests and build commands
+- Installing dependencies with package managers
+- Viewing file metadata and git status
+- Searching code with grep or ripgrep
+
+## User Deny Rules (actions that should be blocked)
+<user_deny_rules_to_replace>
+</user_deny_rules_to_replace>
+
+- Deleting files outside the project directory
+- Executing arbitrary shell commands without explicit user confirmation
+- Modifying system configuration files
+- Accessing sensitive environment variables
+- Network operations to unknown hosts
+- Irreversible file operations
+
+## Environment Context
+<user_environment_to_replace>
+</user_environment_to_replace>
+
+- Project root: current working directory
+- Operating system: detected at runtime
+- User has full control over project directory

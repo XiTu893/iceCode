@@ -1,4 +1,4 @@
-﻿import * as grpc from '@grpc/grpc-js'
+import * as grpc from '@grpc/grpc-js'
 import * as protoLoader from '@grpc/proto-loader'
 import path from 'path'
 import { randomUUID } from 'crypto'
@@ -8,7 +8,7 @@ import { getDefaultAppState } from '../state/AppStateStore.js'
 import { AppState } from '../state/AppState.js'
 import { FileStateCache, READ_FILE_STATE_CACHE_SIZE } from '../utils/fileStateCache.js'
 
-const PROTO_PATH = path.resolve(import.meta.dirname, '../proto/IceCode.proto')
+const PROTO_PATH = path.resolve(import.meta.dirname, '../proto/icecode.proto')
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,
