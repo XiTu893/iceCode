@@ -1,0 +1,155 @@
+name: Build IceCode IDE (VSCode Fork)
+
+on:
+  push:
+    tags:
+      - 'icecode-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win-x64
+          - os: ubuntu-latest
+            platform: linux-x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install VSCode dependencies
+        run: |
+          cd vscode
+          npm install --ignore-scripts
+          cd build && npm install --ignore-scripts && cd ..
+
+      - name: Compile VSCode
+        run: |
+          cd vscode
+          node --experimental-strip-types --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js compile
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Compile Extensions
+        run: |
+          cd vscode
+          node --experimental-strip-types --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js compile-extensions
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Build IceCode AI Extension
+        run: |
+          cd vscode/extensions/icecode-ai
+          npm install
+          npm run compile
+
+      - name: Package Windows
+        if: runner.os == 'Windows'
+        run: |
+          cd vscode
+          node --experimental-strip-types --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js vscode-win32-x64
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Package Linux
+        if: runner.os == 'Linux'
+        run: |
+          cd vscode
+          node --experimental-strip-types --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js vscode-linux-x64
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+
+      - name: Create ZIP (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $sourceDir = "vscode/.build/win32-x64/IceCode IDE"
+          if (Test-Path $sourceDir) {
+            Compress-Archive -Path $sourceDir -DestinationPath "IceCode-IDE-win-x64.zip"
+          } else {
+            Write-Host "Looking for build output..."
+            Get-ChildItem -Path "vscode/.build" -Recurse -Depth 2 | Select-Object FullName
+          }
+
+      - name: Create ZIP (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          if [ -d "vscode/.build/linux-x64/IceCode IDE" ]; then
+            cd vscode/.build/linux-x64
+            tar -czf ../../../IceCode-IDE-linux-x64.tar.gz "IceCode IDE"
+          else
+            echo "Looking for build output..."
+            find vscode/.build -maxdepth 3 -type d
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: IceCode-IDE-${{ matrix.platform }}
+          path: |
+            IceCode-IDE-*.zip
+            IceCode-IDE-*.tar.gz
+          retention-days: 90
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: List artifacts
+        run: find artifacts -type f | head -50
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/**/*.zip
+            artifacts/**/*.tar.gz
+          generate_release_notes: true
+          body: |
+            ## IceCode IDE - VSCode Fork Release
+
+            ### Download & Run
+            1. Download the ZIP/TAR for your platform
+            2. Extract to any folder
+            3. Run `IceCode IDE` executable
+
+            ### Features
+            - Based on VSCode 1.121.0 (full editor capabilities)
+            - IceCode AI panel (left sidebar, Trae-style)
+            - IceCode Dark theme (default)
+            - Open VSX extension marketplace
+            - Claude Code backend integration via gRPC
+            - Multi-LLM support (Claude/GPT/Gemini/DeepSeek/Ollama)
+            - Built-in Git, Terminal, Debug support
+            - Full VSCode extension compatibility
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

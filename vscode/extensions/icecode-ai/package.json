@@ -1,0 +1,154 @@
+{
+  "name": "icecode-ai",
+  "displayName": "IceCode AI",
+  "description": "IceCode AI Assistant - Powered by Claude Code",
+  "version": "0.1.0",
+  "publisher": "icecode",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Chat",
+    "Machine Learning",
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "icon": "media/icon.png",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "icecode-ai",
+          "title": "IceCode AI",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "icecode-ai": [
+        {
+          "type": "webview",
+          "id": "icecode-ai.chat",
+          "name": "Chat",
+          "when": "!icecode-ai.disabled"
+        },
+        {
+          "id": "icecode-ai.sessions",
+          "name": "Sessions",
+          "when": "!icecode-ai.disabled"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "icecode-ai.openChat",
+        "title": "IceCode AI: Open Chat"
+      },
+      {
+        "command": "icecode-ai.newSession",
+        "title": "IceCode AI: New Session"
+      },
+      {
+        "command": "icecode-ai.sendToChat",
+        "title": "IceCode AI: Send to Chat"
+      },
+      {
+        "command": "icecode-ai.toggleSidePanel",
+        "title": "IceCode AI: Toggle Side Panel"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "icecode-ai.openChat",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i"
+      },
+      {
+        "command": "icecode-ai.newSession",
+        "key": "ctrl+shift+alt+n",
+        "mac": "cmd+shift+alt+n"
+      }
+    ],
+    "configuration": {
+      "title": "IceCode AI",
+      "properties": {
+        "icecode-ai.backendUrl": {
+          "type": "string",
+          "default": "localhost:50051",
+          "description": "gRPC backend URL for Claude Code"
+        },
+        "icecode-ai.model": {
+          "type": "string",
+          "default": "claude-sonnet-4-20250514",
+          "enum": [
+            "claude-sonnet-4-20250514",
+            "claude-opus-4-20250514",
+            "claude-haiku-3-5-20241022"
+          ],
+          "description": "AI model to use"
+        },
+        "icecode-ai.theme": {
+          "type": "string",
+          "default": "dark",
+          "enum": [
+            "dark",
+            "light"
+          ],
+          "description": "Chat panel theme"
+        },
+        "icecode-ai.fontSize": {
+          "type": "number",
+          "default": 14,
+          "description": "Chat panel font size"
+        },
+        "icecode-ai.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-start backend on IDE launch"
+        }
+      }
+    },
+    "menus": {
+      "editor/context": [
+        {
+          "command": "icecode-ai.sendToChat",
+          "when": "editorHasSelection",
+          "group": "icecode@1"
+        }
+      ]
+    },
+    "colors": [
+      {
+        "id": "icecode-ai.background",
+        "description": "IceCode AI panel background",
+        "defaults": {
+          "dark": "#0B1A2E",
+          "light": "#F0F4F8",
+          "highContrast": "#000000"
+        }
+      },
+      {
+        "id": "icecode-ai.accent",
+        "description": "IceCode AI accent color",
+        "defaults": {
+          "dark": "#00D4FF",
+          "light": "#0099FF",
+          "highContrast": "#00FFFF"
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --target=node20",
+    "watch": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --target=node20 --watch --sourcemap"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.90.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.7.0"
+  }
+}

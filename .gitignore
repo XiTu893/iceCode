@@ -15,6 +15,41 @@ coverage/
 agent.log
 plan/
 
+# VSCode fork build artifacts
+vscode/node_modules/
+vscode/out/
+vscode/.build/
+vscode/build/node_modules/
+vscode/build/out/
+vscode/extensions/*/node_modules/
+vscode/extensions/*/out/
+vscode/.product.json
+vscode/package-lock.json
+vscode/**/node_modules/
+vscode/**/package-lock.json
+vscode/extensions/copilot/
+vscode/test/
+vscode/.git-blame-ignore-revs
+vscode/.lsifrc.json
+vscode/.mailmap
+vscode/.mention-bot
+vscode/.devcontainer/
+vscode/.github/
+vscode/.vscode/
+vscode/build/package-lock.json
+vscode/build/rspack/package-lock.json
+vscode/build/npm/gyp/package-lock.json
+vscode/cli/target/
+vscode/extensions/*/package-lock.json
+vscode/remote/package-lock.json
+vscode/screenshot*.png
+vscode/ThirdPartyNotices.txt
+vscode/cglicenses.json
+vscode/cgmanifest.json
+vscode/CONTRIBUTING.md
+vscode/SECURITY.md
+vscode/CodeQL.yml
+
 # Trae IDE configuration (not for public)
 .trae/
 

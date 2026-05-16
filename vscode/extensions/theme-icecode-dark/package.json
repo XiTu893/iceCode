@@ -1,0 +1,19 @@
+{
+  "name": "theme-icecode-dark",
+  "displayName": "IceCode Dark",
+  "description": "IceCode IDE Dark Theme - Inspired by Trae IDE",
+  "version": "0.1.0",
+  "publisher": "icecode",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Themes"],
+  "icon": "icon.png",
+  "contributes": {
+    "themes": [
+      {
+        "label": "IceCode Dark",
+        "uiTheme": "vs-dark",
+        "path": "themes/icecode-dark-color-theme.json"
+      }
+    ]
+  }
+}
