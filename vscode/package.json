@@ -202,7 +202,7 @@
     "eslint-plugin-jsdoc": "^50.3.1",
     "event-stream": "3.3.4",
     "fancy-log": "^1.3.3",
-    "glob": "^5.0.13",
+    "glob": "^9.3.5",
     "gulp": "^4.0.0",
     "gulp-azure-storage": "^0.12.1",
     "gulp-bom": "^3.0.0",
@@ -252,6 +252,7 @@
     "yaserver": "^0.4.0"
   },
   "overrides": {
+    "glob": "^9.3.5",
     "node-gyp-build": "4.8.1",
     "kerberos@2.1.1": {
       "node-addon-api": "7.1.0"

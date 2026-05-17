@@ -45,45 +45,70 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev libkrb5-dev
 
-      - name: Install VSCode dependencies
+      - name: Setup build environment (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          cd vscode
-          npm install
-          cd build && npm install && cd ..
+          $vsPath = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise"
+          if (-not (Test-Path $vsPath)) {
+            $vsPath = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community"
+          }
+          if (-not (Test-Path $vsPath)) {
+            $vsPath = "${env:ProgramFiles}\Microsoft Visual Studio\2022\BuildTools"
+          }
+          if (Test-Path $vsPath) {
+            Write-Host "Found Visual Studio at: $vsPath"
+            $env:vs2022_install = $vsPath
+            echo "vs2022_install=$vsPath" >> $env:GITHUB_ENV
+          } else {
+            Write-Host "Visual Studio not found, installing Build Tools..."
+            choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --quiet" --no-progress
+          }
+
+      - name: Check npm version
+        run: npm --version
+
+      - name: Install VSCode dependencies
+        working-directory: vscode
+        env:
+          VSCODE_SKIP_NODE_VERSION_CHECK: '1'
+          npm_command: install
+          GYP_MSVS_VERSION: '2022'
+        run: npm install --no-optional 2>&1 || npm install --ignore-scripts --no-optional
+
+      - name: Install build dependencies
+        working-directory: vscode/build
+        run: npm install --ignore-scripts
 
       - name: Compile VSCode
-        run: |
-          cd vscode
-          npm run compile
+        working-directory: vscode
+        run: npm run compile
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Compile Extensions
-        run: |
-          cd vscode
-          npm run gulp compile-extensions
+        working-directory: vscode
+        run: npm run gulp compile-extensions
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Build IceCode AI Extension
+        working-directory: vscode/extensions/icecode-ai
         run: |
-          cd vscode/extensions/icecode-ai
           npm install
           npm run compile
 
       - name: Package Windows
         if: runner.os == 'Windows'
-        run: |
-          cd vscode
-          npm run gulp vscode-win32-x64
+        working-directory: vscode
+        run: npm run gulp vscode-win32-x64
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Package Linux
         if: runner.os == 'Linux'
-        run: |
-          cd vscode
-          npm run gulp vscode-linux-x64
+        working-directory: vscode
+        run: npm run gulp vscode-linux-x64
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
