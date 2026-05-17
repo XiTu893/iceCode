@@ -23,9 +23,14 @@
 #### AI Chat Panel (Trae-style)
 
 - Left sidebar AI chat panel, always accessible
+- **Three AI modes**: Chat / Builder / Agent
+- **Safety policy selector**: Auto / Manual / Confirm
 - Streaming response with real-time token display
 - Code block rendering with **Copy** and **Insert** actions
-- System messages for contextual information
+- **AI stage tags**: Thinking / Searching / Reading / Editing / Building
+- **Diff preview**: Accept / Reject code changes
+- **Welcome page** with suggestion cards
+- Chinese IME compatible input
 - Keyboard shortcut: `Ctrl+Shift+I`
 
 #### Inline Code Completion
@@ -46,24 +51,40 @@
 - **Add Documentation** — AI adds doc comments
 - **Refactor Code** — AI refactors for readability
 
-#### Slash Commands
+#### Slash Commands (22 commands)
 
 Type `/` in the chat input to see available commands:
 
+**Claude Code Compatible (14)**:
+
 | Command | Description |
 |---------|-------------|
-| `/help` | Show available commands |
-| `/clear` | Clear current chat session |
-| `/explain` | Explain selected or current code |
-| `/fix` | Fix bugs in selected code |
-| `/optimize` | Optimize selected code |
-| `/test` | Generate unit tests |
-| `/doc` | Add documentation |
-| `/refactor` | Refactor code |
-| `/review` | Review code for issues |
-| `/model` | Switch AI model |
-| `/context` | Show current context info |
-| `/compact` | Compact conversation history |
+| `/help` | 显示可用命令 |
+| `/clear` | 清除当前对话 |
+| `/compact` | 压缩对话历史以节省 token |
+| `/init` | 初始化项目 CLAUDE.md 文件 |
+| `/model` | 切换 AI 模型 |
+| `/config` | 打开配置设置 |
+| `/permissions` | 管理工具权限 |
+| `/login` | 登录 AI 服务 |
+| `/logout` | 登出 AI 服务 |
+| `/doctor` | 运行诊断检查 |
+| `/bug` | 报告 Bug |
+| `/cost` | 显示 token 用量和费用 |
+| `/status` | 显示会话状态 |
+| `/quit` | 关闭 AI 面板 |
+
+**IceCode Extended (7)**:
+
+| Command | Description |
+|---------|-------------|
+| `/explain` | 解释选中代码 |
+| `/fix` | 修复选中代码的 Bug |
+| `/optimize` | 优化选中代码 |
+| `/test` | 生成单元测试 |
+| `/doc` | 添加文档注释 |
+| `/refactor` | 重构代码 |
+| `/review` | 审查代码变更 |
 
 #### @ File References
 
@@ -103,21 +124,24 @@ Switch models instantly via Quick Pick UI:
 
 #### IceCode Dark (Default)
 
-Deep navy blue + ice cyan accent theme, inspired by Trae IDE:
+Trae-style deep dark + purple-blue accent theme:
 
-- Editor background: `#0B1A2E`
-- Accent color: `#00D4FF`
-- Syntax highlighting: Purple keywords, Green strings, Cyan functions, Orange parameters
+- Editor background: `#0d1117`
+- Accent color: `#8b5cf6`
+- Syntax highlighting: Cyan keywords, Orange strings, Purple functions, Amber numbers
 - Full terminal ANSI 16-color palette
 - Consistent UI: Activity bar, sidebar, title bar, status bar, panels
 
-### Brand & Identity
+### Status Bar AI Indicator
 
-- Custom IceCode branding across all platforms
-- Ice crystal icon (SVG + ICO)
-- Custom product name, data directories, URL protocol
-- Windows Start Menu integration
-- About dialog shows IceCode IDE
+- Left: AI panel toggle button (purple icon)
+- Right: Backend connection status (green = connected, red = disconnected)
+
+### Full Chinese Interface
+
+- All UI text in Chinese (chat panel, commands, settings, system messages)
+- `package.nls.zh-cn.json` for VSCode localization
+- Chinese IME compatible input handling
 
 ---
 
@@ -139,7 +163,7 @@ IceCode IDE
 │   │   │   │   └── historyManager.ts # Chat history persistence
 │   │   │   └── media/
 │   │   │       ├── style.css        # Chat panel styles
-│   │   │       └── icon.svg         # AI panel icon
+│   │   │       └── icon.svg         # AI panel icon (purple #8b5cf6)
 │   │   └── theme-icecode-dark/      # IceCode Dark theme
 │   ├── product.json                 # Brand configuration
 │   └── resources/
@@ -148,10 +172,8 @@ IceCode IDE
 ├── src/                             # Claude Code backend
 │   ├── proto/icecode.proto          # gRPC service definition
 │   └── ...                          # AI agent source code
-├── ide/                             # Legacy Electron IDE (v1)
 ├── .github/workflows/
-│   ├── build-icecode-vscode.yml     # VSCode fork CI/CD
-│   └── build-ide.yml                # Legacy IDE CI/CD
+│   └── build-icecode-vscode.yml     # VSCode fork CI/CD
 └── package.json                     # Root package (Claude Code CLI)
 ```
 
@@ -170,14 +192,11 @@ IceCode IDE
 ```bash
 # Install dependencies
 cd vscode
-npm install
+npm ci
 cd build && npm install && cd ..
 
-# Compile VSCode core
-npm run compile
-
-# Compile extensions
-npm run gulp compile-extensions
+# Compile VSCode core (product build)
+npm run gulp core-ci
 
 # Build IceCode AI extension
 cd extensions/icecode-ai
@@ -192,14 +211,14 @@ cd ../../..
 ### Package for Distribution
 
 ```bash
-# Windows x64
-npm run gulp vscode-win32-x64
+# Windows x64 (CI optimized)
+npm run gulp vscode-win32-x64-min-ci
 
-# Linux x64
-npm run gulp vscode-linux-x64
+# Linux x64 (CI optimized)
+npm run gulp vscode-linux-x64-min-ci
 
 # macOS
-npm run gulp vscode-darwin-arm64
+npm run gulp vscode-darwin-arm64-min-ci
 ```
 
 ### GitHub Actions (CI/CD)
@@ -213,9 +232,10 @@ git push origin icecode-v0.2.0
 
 This triggers the `build-icecode-vscode.yml` workflow which:
 1. Sets up Node.js 22 + Python 3.12
-2. Compiles VSCode + extensions
-3. Packages for Windows x64 and Linux x64
-4. Creates a GitHub Release with downloadable ZIP/TAR
+2. Compiles VSCode core with `gulp core-ci`
+3. Builds IceCode AI extension
+4. Packages Electron desktop IDE with `gulp vscode-win32-x64-min-ci`
+5. Creates a GitHub Release with downloadable ZIP/TAR
 
 ---
 
@@ -225,6 +245,8 @@ This triggers the `build-icecode-vscode.yml` workflow which:
 |---------|---------|-------------|
 | `icecode-ai.backendUrl` | `localhost:50051` | gRPC backend URL |
 | `icecode-ai.model` | `claude-sonnet-4-20250514` | AI model to use |
+| `icecode-ai.mode` | `chat` | AI mode (chat/builder/agent) |
+| `icecode-ai.safetyPolicy` | `manual` | Safety policy (auto/manual/confirm) |
 | `icecode-ai.theme` | `dark` | Chat panel theme |
 | `icecode-ai.fontSize` | `14` | Chat panel font size |
 | `icecode-ai.autoStart` | `true` | Auto-start backend |
@@ -256,13 +278,18 @@ This triggers the `build-icecode-vscode.yml` workflow which:
 |---------|-------------|----------|
 | Editor Core | VSCode 1.121.0 | VSCode fork |
 | AI Chat Panel | Left sidebar | Left sidebar |
+| AI Modes | Chat/Builder/Agent | Chat/Builder/Agent |
+| Safety Policy | Auto/Manual/Confirm | Auto/Manual/Confirm |
+| Diff Preview | Accept/Reject | Accept/Reject |
+| AI Stage Tags | 5 colored tags | 5 colored tags |
 | Inline Completion | Multi-model | Claude only |
 | Code Actions | 6 actions | Similar |
-| Slash Commands | 12 commands | Limited |
+| Slash Commands | 22 commands | Limited |
 | @ File References | Yes | Yes |
 | Multi-Model | Claude/GPT/Gemini/DeepSeek/Ollama | Claude only |
 | Extension Market | Open VSX | VSCode Market |
-| Theme | IceCode Dark | Trae Dark |
+| Theme | IceCode Dark (#8b5cf6) | Trae Dark |
+| Language | Full Chinese UI | Chinese UI |
 | Backend | Claude Code (open) | Proprietary |
 | License | MIT | Proprietary |
 

@@ -52,24 +52,3 @@ vscode/CodeQL.yml
 
 # Trae IDE configuration (not for public)
 .trae/
-
-# IDE internal docs (not for public)
-ide/CHECKLIST.md
-ide/CHINESE_UI_COMPLETION.md
-ide/COMPLETION_SUMMARY_CN.md
-ide/DEVELOPMENT.md
-ide/FINAL_REPORT.md
-ide/PROJECT_STATUS.md
-ide/QUICKSTART.md
-ide/QUICK_REFERENCE.md
-ide/TESTING_GUIDE.md
-ide/WEEK2_SUMMARY.md
-ide/WEEK3_4_PROGRESS.md
-ide/WEEK5_6_PROGRESS.md
-ide/BUILD_FIX.md
-ide/BUILD_GUIDE.md
-ide/GITHUB_ACTIONS_GUIDE.md
-ide/INTEGRATION_PLAN.md
-ide/BACKEND_INTEGRATION_SUMMARY.md
-ide/README_IDE.md
-ide/AUTO_BACKEND_MANAGEMENT.md
