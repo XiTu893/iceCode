@@ -26,7 +26,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          lfs: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,23 +39,29 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Setup build environment (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev libkrb5-dev
+
       - name: Install VSCode dependencies
         run: |
           cd vscode
-          npm install --ignore-scripts
-          cd build && npm install --ignore-scripts && cd ..
+          npm install
+          cd build && npm install && cd ..
 
       - name: Compile VSCode
         run: |
           cd vscode
-          node --experimental-strip-types --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js compile
+          npm run compile
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Compile Extensions
         run: |
           cd vscode
-          node --experimental-strip-types --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js compile-extensions
+          npm run gulp compile-extensions
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
@@ -68,7 +75,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           cd vscode
-          node --experimental-strip-types --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js vscode-win32-x64
+          npm run gulp vscode-win32-x64
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
@@ -76,7 +83,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           cd vscode
-          node --experimental-strip-types --max-old-space-size=8192 ./node_modules/gulp/bin/gulp.js vscode-linux-x64
+          npm run gulp vscode-linux-x64
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
@@ -84,23 +91,38 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $sourceDir = "vscode/.build/win32-x64/IceCode IDE"
-          if (Test-Path $sourceDir) {
-            Compress-Archive -Path $sourceDir -DestinationPath "IceCode-IDE-win-x64.zip"
+          $buildDir = "vscode/.build/win32-x64"
+          if (Test-Path $buildDir) {
+            $appDir = Get-ChildItem -Path $buildDir -Directory | Select-Object -First 1
+            if ($appDir) {
+              Compress-Archive -Path $appDir.FullName -DestinationPath "IceCode-IDE-win-x64.zip"
+              Write-Host "Packaged: $($appDir.FullName)"
+            } else {
+              Write-Host "No app directory found in $buildDir"
+              Get-ChildItem -Path $buildDir -Recurse -Depth 1 | Select-Object FullName
+            }
           } else {
-            Write-Host "Looking for build output..."
+            Write-Host "Build directory not found: $buildDir"
             Get-ChildItem -Path "vscode/.build" -Recurse -Depth 2 | Select-Object FullName
           }
 
-      - name: Create ZIP (Linux)
+      - name: Create TAR (Linux)
         if: runner.os == 'Linux'
         run: |
-          if [ -d "vscode/.build/linux-x64/IceCode IDE" ]; then
-            cd vscode/.build/linux-x64
-            tar -czf ../../../IceCode-IDE-linux-x64.tar.gz "IceCode IDE"
+          BUILD_DIR="vscode/.build/linux-x64"
+          if [ -d "$BUILD_DIR" ]; then
+            APP_DIR=$(find "$BUILD_DIR" -maxdepth 1 -type d | tail -1)
+            if [ -n "$APP_DIR" ] && [ "$APP_DIR" != "$BUILD_DIR" ]; then
+              cd "$BUILD_DIR"
+              tar -czf ../../../IceCode-IDE-linux-x64.tar.gz "$(basename "$APP_DIR")"
+              echo "Packaged: $APP_DIR"
+            else
+              echo "No app directory found in $BUILD_DIR"
+              find "$BUILD_DIR" -maxdepth 2 -type d
+            fi
           else
-            echo "Looking for build output..."
-            find vscode/.build -maxdepth 3 -type d
+            echo "Build directory not found: $BUILD_DIR"
+            find vscode/.build -maxdepth 3 -type d 2>/dev/null || echo "No .build directory"
           fi
 
       - name: Upload artifact
@@ -111,6 +133,7 @@ jobs:
             IceCode-IDE-*.zip
             IceCode-IDE-*.tar.gz
           retention-days: 90
+          if-no-files-found: warn
 
   release:
     name: Create Release
