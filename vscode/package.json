@@ -252,7 +252,6 @@
     "yaserver": "^0.4.0"
   },
   "overrides": {
-    "glob": "^9.3.5",
     "node-gyp-build": "4.8.1",
     "kerberos@2.1.1": {
       "node-addon-api": "7.1.0"
