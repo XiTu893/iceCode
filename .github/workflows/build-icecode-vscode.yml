@@ -19,15 +19,16 @@ jobs:
         include:
           - os: windows-latest
             platform: win-x64
+            arch: x64
           - os: ubuntu-latest
             platform: linux-x64
+            arch: x64
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          lfs: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -45,50 +46,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libx11-dev libxkbfile-dev libsecret-1-dev libkrb5-dev
 
-      - name: Setup build environment (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $vsPath = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Enterprise"
-          if (-not (Test-Path $vsPath)) {
-            $vsPath = "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community"
-          }
-          if (-not (Test-Path $vsPath)) {
-            $vsPath = "${env:ProgramFiles}\Microsoft Visual Studio\2022\BuildTools"
-          }
-          if (Test-Path $vsPath) {
-            Write-Host "Found Visual Studio at: $vsPath"
-            $env:vs2022_install = $vsPath
-            echo "vs2022_install=$vsPath" >> $env:GITHUB_ENV
-          } else {
-            Write-Host "Visual Studio not found, installing Build Tools..."
-            choco install visualstudio2022buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --quiet" --no-progress
-          }
-
-      - name: Check npm version
-        run: npm --version
-
       - name: Install VSCode dependencies
         working-directory: vscode
         env:
-          VSCODE_SKIP_NODE_VERSION_CHECK: '1'
-          npm_command: install
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
-        run: npm install --no-optional 2>&1 || npm install --ignore-scripts --no-optional
+        run: npm ci 2>&1 || npm install --ignore-scripts
 
       - name: Install build dependencies
         working-directory: vscode/build
         run: npm install --ignore-scripts
 
-      - name: Compile VSCode
+      - name: Compile core
         working-directory: vscode
-        run: npm run compile
-        env:
-          NODE_OPTIONS: --max-old-space-size=8192
-
-      - name: Compile Extensions
-        working-directory: vscode
-        run: npm run gulp compile-extensions
+        run: npm run gulp core-ci
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
@@ -98,56 +69,49 @@ jobs:
           npm install
           npm run compile
 
-      - name: Package Windows
+      - name: Build Windows client
         if: runner.os == 'Windows'
         working-directory: vscode
-        run: npm run gulp vscode-win32-x64
+        run: npm run gulp "vscode-win32-${{ matrix.arch }}-min-ci"
         env:
           NODE_OPTIONS: --max-old-space-size=8192
+          VSCODE_ARCH: ${{ matrix.arch }}
 
-      - name: Package Linux
+      - name: Build Linux client
         if: runner.os == 'Linux'
         working-directory: vscode
-        run: npm run gulp vscode-linux-x64
+        run: npm run gulp "vscode-linux-${{ matrix.arch }}-min-ci"
         env:
           NODE_OPTIONS: --max-old-space-size=8192
+          VSCODE_ARCH: ${{ matrix.arch }}
 
       - name: Create ZIP (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $buildDir = "vscode/.build/win32-x64"
+          $buildDir = Join-Path (Split-Path $PWD.Path) "VSCode-win32-${{ matrix.arch }}"
           if (Test-Path $buildDir) {
-            $appDir = Get-ChildItem -Path $buildDir -Directory | Select-Object -First 1
-            if ($appDir) {
-              Compress-Archive -Path $appDir.FullName -DestinationPath "IceCode-IDE-win-x64.zip"
-              Write-Host "Packaged: $($appDir.FullName)"
-            } else {
-              Write-Host "No app directory found in $buildDir"
-              Get-ChildItem -Path $buildDir -Recurse -Depth 1 | Select-Object FullName
-            }
+            Compress-Archive -Path $buildDir -DestinationPath "IceCode-IDE-win-x64.zip"
+            Write-Host "Packaged: $buildDir"
+            Get-ChildItem $buildDir -Depth 0 | Select-Object Name
           } else {
             Write-Host "Build directory not found: $buildDir"
-            Get-ChildItem -Path "vscode/.build" -Recurse -Depth 2 | Select-Object FullName
+            $parentDir = Split-Path $PWD.Path
+            Get-ChildItem $parentDir -Depth 0 | Select-Object Name
           }
 
       - name: Create TAR (Linux)
         if: runner.os == 'Linux'
         run: |
-          BUILD_DIR="vscode/.build/linux-x64"
+          BUILD_DIR="../VSCode-linux-${{ matrix.arch }}"
           if [ -d "$BUILD_DIR" ]; then
-            APP_DIR=$(find "$BUILD_DIR" -maxdepth 1 -type d | tail -1)
-            if [ -n "$APP_DIR" ] && [ "$APP_DIR" != "$BUILD_DIR" ]; then
-              cd "$BUILD_DIR"
-              tar -czf ../../../IceCode-IDE-linux-x64.tar.gz "$(basename "$APP_DIR")"
-              echo "Packaged: $APP_DIR"
-            else
-              echo "No app directory found in $BUILD_DIR"
-              find "$BUILD_DIR" -maxdepth 2 -type d
-            fi
+            cd "$(dirname "$BUILD_DIR")"
+            tar -czf "$GITHUB_WORKSPACE/IceCode-IDE-linux-x64.tar.gz" "$(basename "$BUILD_DIR")"
+            echo "Packaged: $BUILD_DIR"
+            ls -la "$BUILD_DIR" | head -20
           else
             echo "Build directory not found: $BUILD_DIR"
-            find vscode/.build -maxdepth 3 -type d 2>/dev/null || echo "No .build directory"
+            ls -la .. | head -20
           fi
 
       - name: Upload artifact
@@ -185,19 +149,26 @@ jobs:
           body: |
             ## IceCode IDE - VSCode Fork Release
 
-            ### Download & Run
-            1. Download the ZIP/TAR for your platform
-            2. Extract to any folder
-            3. Run `IceCode IDE` executable
+            ### 下载与运行
+            1. 下载对应平台的 ZIP/TAR
+            2. 解压到任意目录
+            3. 运行 `IceCode IDE` 可执行文件
 
-            ### Features
-            - Based on VSCode 1.121.0 (full editor capabilities)
-            - IceCode AI panel (left sidebar, Trae-style)
-            - IceCode Dark theme (default)
-            - Open VSX extension marketplace
-            - Claude Code backend integration via gRPC
-            - Multi-LLM support (Claude/GPT/Gemini/DeepSeek/Ollama)
-            - Built-in Git, Terminal, Debug support
-            - Full VSCode extension compatibility
+            ### 功能特性
+            - 基于 VSCode 1.121.0（完整编辑器能力）
+            - IceCode AI 面板（左侧边栏，Trae 风格）
+            - IceCode Dark 主题（紫蓝色 #8b5cf6）
+            - 三模式切换（对话/构建/智能体）
+            - 安全策略选择器（自动/手动/确认）
+            - 22 个斜杠命令（14 Claude Code + 7 IceCode + /quit）
+            - 全面中文界面
+            - Diff 预览（Accept/Reject）
+            - AI 工作阶段彩色标签
+            - 状态栏 AI 指示器
+            - Open VSX 扩展市场
+            - Claude Code gRPC 后端集成
+            - 多 LLM 支持（Claude/GPT/Gemini/DeepSeek/Ollama）
+            - 内置 Git、终端、调试支持
+            - 完整 VSCode 扩展兼容性
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
