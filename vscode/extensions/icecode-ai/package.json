@@ -1,7 +1,7 @@
 {
   "name": "icecode-ai",
-  "displayName": "IceCode AI",
-  "description": "IceCode AI Assistant - Powered by Claude Code",
+  "displayName": "%displayName%",
+  "description": "%description%",
   "version": "0.2.0",
   "publisher": "icecode",
   "engines": {
@@ -22,7 +22,7 @@
       "activitybar": [
         {
           "id": "icecode-ai",
-          "title": "IceCode AI",
+          "title": "%viewsContainers.activitybar.title%",
           "icon": "media/icon.svg"
         }
       ]
@@ -32,12 +32,12 @@
         {
           "type": "webview",
           "id": "icecode-ai.chat",
-          "name": "Chat",
+          "name": "%views.chat.name%",
           "when": "!icecode-ai.disabled"
         },
         {
           "id": "icecode-ai.sessions",
-          "name": "Sessions",
+          "name": "%views.sessions.name%",
           "when": "!icecode-ai.disabled"
         }
       ]
@@ -45,51 +45,87 @@
     "commands": [
       {
         "command": "icecode-ai.openChat",
-        "title": "IceCode AI: Open Chat"
+        "title": "%command.openChat.title%"
       },
       {
         "command": "icecode-ai.newSession",
-        "title": "IceCode AI: New Session"
+        "title": "%command.newSession.title%"
       },
       {
         "command": "icecode-ai.sendToChat",
-        "title": "IceCode AI: Send to Chat"
+        "title": "%command.sendToChat.title%"
       },
       {
         "command": "icecode-ai.toggleSidePanel",
-        "title": "IceCode AI: Toggle Side Panel"
+        "title": "%command.toggleSidePanel.title%"
       },
       {
         "command": "icecode-ai.explainCode",
-        "title": "IceCode AI: Explain Code"
+        "title": "%command.explainCode.title%"
       },
       {
         "command": "icecode-ai.fixCode",
-        "title": "IceCode AI: Fix Code"
+        "title": "%command.fixCode.title%"
       },
       {
         "command": "icecode-ai.optimizeCode",
-        "title": "IceCode AI: Optimize Code"
+        "title": "%command.optimizeCode.title%"
       },
       {
         "command": "icecode-ai.addTests",
-        "title": "IceCode AI: Generate Tests"
+        "title": "%command.addTests.title%"
       },
       {
         "command": "icecode-ai.addDocs",
-        "title": "IceCode AI: Add Documentation"
+        "title": "%command.addDocs.title%"
       },
       {
         "command": "icecode-ai.refactorCode",
-        "title": "IceCode AI: Refactor Code"
+        "title": "%command.refactorCode.title%"
       },
       {
         "command": "icecode-ai.switchModel",
-        "title": "IceCode AI: Switch Model"
+        "title": "%command.switchModel.title%"
       },
       {
         "command": "icecode-ai.toggleInlineCompletion",
-        "title": "IceCode AI: Toggle Inline Completion"
+        "title": "%command.toggleInlineCompletion.title%"
+      },
+      {
+        "command": "icecode-ai.initProject",
+        "title": "%command.initProject.title%"
+      },
+      {
+        "command": "icecode-ai.openConfig",
+        "title": "%command.openConfig.title%"
+      },
+      {
+        "command": "icecode-ai.managePermissions",
+        "title": "%command.managePermissions.title%"
+      },
+      {
+        "command": "icecode-ai.login",
+        "title": "%command.login.title%"
+      },
+      {
+        "command": "icecode-ai.logout",
+        "title": "%command.logout.title%"
+      },
+      {
+        "command": "icecode-ai.doctor",
+        "title": "%command.doctor.title%"
+      },
+      {
+        "command": "icecode-ai.reportBug",
+        "title": "%command.reportBug.title%"
+      },
+      {
+        "command": "icecode-ai.showCost",
+        "title": "%command.showCost.title%"
+      },
+      {
+        "command": "icecode-ai.showStatus",
+        "title": "%command.showStatus.title%"
       }
     ],
     "keybindings": [
@@ -120,12 +156,12 @@
       }
     ],
     "configuration": {
-      "title": "IceCode AI",
+      "title": "%configuration.title%",
       "properties": {
         "icecode-ai.backendUrl": {
           "type": "string",
           "default": "localhost:50051",
-          "description": "gRPC backend URL for Claude Code"
+          "description": "%configuration.backendUrl.description%"
         },
         "icecode-ai.model": {
           "type": "string",
@@ -142,54 +178,68 @@
             "ollama:codellama",
             "ollama:deepseek-coder"
           ],
-          "description": "AI model to use"
+          "description": "%configuration.model.description%"
         },
         "icecode-ai.theme": {
           "type": "string",
           "default": "dark",
           "enum": ["dark", "light"],
-          "description": "Chat panel theme"
+          "description": "%configuration.theme.description%"
         },
         "icecode-ai.fontSize": {
           "type": "number",
           "default": 14,
-          "description": "Chat panel font size"
+          "description": "%configuration.fontSize.description%"
         },
         "icecode-ai.autoStart": {
           "type": "boolean",
           "default": true,
-          "description": "Auto-start backend on IDE launch"
+          "description": "%configuration.autoStart.description%"
         },
         "icecode-ai.inlineCompletionEnabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable AI inline code completion"
+          "description": "%configuration.inlineCompletionEnabled.description%"
         },
         "icecode-ai.inlineCompletionDelay": {
           "type": "number",
           "default": 300,
-          "description": "Delay in ms before triggering inline completion"
+          "description": "%configuration.inlineCompletionDelay.description%"
         },
         "icecode-ai.inlineCompletionProvider": {
           "type": "string",
           "default": "auto",
           "enum": ["auto", "icecode", "disabled"],
-          "description": "Inline completion provider"
+          "description": "%configuration.inlineCompletionProvider.description%"
         },
         "icecode-ai.contextLines": {
           "type": "number",
           "default": 50,
-          "description": "Number of context lines to send with code actions"
+          "description": "%configuration.contextLines.description%"
         },
         "icecode-ai.saveHistory": {
           "type": "boolean",
           "default": true,
-          "description": "Save chat history between sessions"
+          "description": "%configuration.saveHistory.description%"
         },
         "icecode-ai.maxHistoryItems": {
           "type": "number",
           "default": 100,
-          "description": "Maximum number of history items to save"
+          "description": "%configuration.maxHistoryItems.description%"
+        },
+        "icecode-ai.mode": {
+          "type": "string",
+          "default": "chat",
+          "enum": ["chat", "builder", "agent"],
+          "enumDescriptions": ["标准对话模式", "构建模式，输出 Diff 预览", "智能体模式，任务流时间线"],
+          "description": "%configuration.mode.description%"
+        },
+        "icecode-ai.safetyPolicy": {
+          "type": "string",
+          "default": "manual",
+          "enum": ["auto", "manual", "confirm"],
+          "enumDescriptions": ["自动执行所有工具调用", "工具调用前显示确认提示", "每一步都需人工确认"],
+          "description": "%configuration.safetyPolicy.description%"
         }
       }
     },
@@ -235,20 +285,20 @@
     "colors": [
       {
         "id": "icecode-ai.background",
-        "description": "IceCode AI panel background",
+        "description": "%color.background.description%",
         "defaults": {
-          "dark": "#0B1A2E",
+          "dark": "#0d1117",
           "light": "#F0F4F8",
           "highContrast": "#000000"
         }
       },
       {
         "id": "icecode-ai.accent",
-        "description": "IceCode AI accent color",
+        "description": "%color.accent.description%",
         "defaults": {
-          "dark": "#00D4FF",
-          "light": "#0099FF",
-          "highContrast": "#00FFFF"
+          "dark": "#8b5cf6",
+          "light": "#7c3aed",
+          "highContrast": "#8b5cf6"
         }
       }
     ]

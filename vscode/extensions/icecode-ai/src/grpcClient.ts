@@ -46,7 +46,7 @@ export class GrpcClient {
             this._reconnectAttempts = 0;
         } catch (error: any) {
             this._connected = false;
-            throw new Error(`Failed to connect to backend: ${error.message}`);
+            throw new Error(`后端连接失败：${error.message}`);
         }
     }
 
@@ -78,14 +78,14 @@ export class GrpcClient {
 
         const iceCodeRoot = this._findIceCodeRoot();
         if (!iceCodeRoot) {
-            throw new Error('IceCode backend not found. Please set the icecode-ai.backendPath setting.');
+            throw new Error('未找到 IceCode 后端。请在设置中配置 icecode-ai.backendPath。');
         }
 
         const bunPath = this._findBun();
         const backendScript = path.join(iceCodeRoot, 'dist', 'cli.mjs');
 
         if (!fs.existsSync(backendScript)) {
-            throw new Error(`Backend script not found: ${backendScript}`);
+            throw new Error(`后端脚本未找到：${backendScript}`);
         }
 
         this._backendProcess = cp.spawn(bunPath, ['run', backendScript, 'grpc', '--port', '50051'], {
@@ -95,13 +95,13 @@ export class GrpcClient {
         });
 
         this._backendProcess.on('error', (err) => {
-            vscode.window.showErrorMessage(`IceCode backend error: ${err.message}`);
+            vscode.window.showErrorMessage(`IceCode 后端错误：${err.message}`);
             this._connected = false;
         });
 
         this._backendProcess.on('exit', (code) => {
             if (code !== 0 && code !== null) {
-                vscode.window.showWarningMessage(`IceCode backend exited with code ${code}`);
+                vscode.window.showWarningMessage(`IceCode 后端退出，代码 ${code}`);
             }
             this._connected = false;
         });
@@ -156,7 +156,7 @@ export class GrpcClient {
                 socket.on('error', () => {
                     socket.destroy();
                     if (Date.now() - startTime > timeout) {
-                        reject(new Error('Backend connection timeout'));
+                        reject(new Error('后端连接超时'));
                     } else {
                         setTimeout(check, 500);
                     }
@@ -187,12 +187,12 @@ export class GrpcClient {
             });
 
             if (!response.ok) {
-                throw new Error(`Backend returned ${response.status}: ${response.statusText}`);
+                throw new Error(`后端返回 ${response.status}：${response.statusText}`);
             }
 
             const reader = response.body?.getReader();
             if (!reader) {
-                throw new Error('No response body');
+                throw new Error('无响应体');
             }
 
             const decoder = new TextDecoder();
@@ -302,6 +302,6 @@ export class GrpcClient {
     }
 
     private _simulateResponse(message: string): string {
-        return `I received your message: "${message}"\n\nThe IceCode AI backend is not currently connected. To enable full AI capabilities:\n\n1. Start the Claude Code backend\n2. Configure the backend URL in settings\n3. Restart IceCode IDE\n\nFor now, I'm running in simulation mode.`;
+        return `我收到了你的消息："${message}"\n\nIceCode AI 后端当前未连接。要启用完整的 AI 功能：\n\n1. 启动 Claude Code 后端\n2. 在设置中配置后端地址\n3. 重启 IceCode IDE\n\n当前运行在模拟模式。`;
     }
 }
