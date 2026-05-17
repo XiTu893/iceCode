@@ -930,6 +930,45 @@ npm run test
             let html = text
                 .replace(/\\u001b\\[\\d+m/g, '')
                 .replace(/\`{}\`/g, '')
+                .replace(/\\[(Thinking|thinking)\\]/g, '<span class="ai-stage ai-stage-thinking">🧠 思考</span>')
+                .replace(/\\[(Searching|searching)\\]/g, '<span class="ai-stage ai-stage-searching">🔍 搜索</span>')
+                .replace(/\\[(Reading|reading)\\]/g, '<span class="ai-stage ai-stage-reading">📖 读取</span>')
+                .replace(/\\[(Editing|editing)\\]/g, '<span class="ai-stage ai-stage-editing">✏️ 编辑</span>')
+                .replace(/\\[(Building|building)\\]/g, '<span class="ai-stage ai-stage-building">🔨 构建</span>')
+                .replace(/\`\`\`diff\\n([\\s\\S]*?)\`\`\`/g, function(match, diffContent) {
+                    const diffId = 'diff-' + Math.random().toString(36).substr(2, 9);
+                    let filePath = '';
+                    let addCount = 0;
+                    let delCount = 0;
+                    const lines = diffContent.split('\\n');
+                    const fileMatch = diffContent.match(/\\+\\+\\+ b\\/(.+)/);
+                    if (fileMatch) filePath = fileMatch[1];
+                    let diffLines = '';
+                    for (const line of lines) {
+                        if (line.startsWith('+++') || line.startsWith('---') || line.startsWith('@@')) continue;
+                        if (line.startsWith('+')) { addCount++; diffLines += '<div class="diff-line-add">' + escapeHtml(line.substring(1)) + '</div>'; }
+                        else if (line.startsWith('-')) { delCount++; diffLines += '<div class="diff-line-del">' + escapeHtml(line.substring(1)) + '</div>'; }
+                        else { diffLines += '<div class="diff-line-ctx">' + escapeHtml(line) + '</div>'; }
+                    }
+                    return '<div class="diff-block" id="' + diffId + '"><div class="diff-header"><span class="diff-file">' + (filePath || '变更') + '</span><div class="diff-actions"><button class="diff-accept" data-diff-id="' + diffId + '" data-file="' + filePath + '">接受</button><button class="diff-reject" data-diff-id="' + diffId + '">拒绝</button></div></div><div class="diff-content">' + diffLines + '</div></div>';
+                })
+                .replace(/\`\`\`patch\\n([\\s\\S]*?)\`\`\`/g, function(match, diffContent) {
+                    const diffId = 'diff-' + Math.random().toString(36).substr(2, 9);
+                    let filePath = '';
+                    let addCount = 0;
+                    let delCount = 0;
+                    const lines = diffContent.split('\\n');
+                    const fileMatch = diffContent.match(/\\+\\+\\+ b\\/(.+)/);
+                    if (fileMatch) filePath = fileMatch[1];
+                    let diffLines = '';
+                    for (const line of lines) {
+                        if (line.startsWith('+++') || line.startsWith('---') || line.startsWith('@@')) continue;
+                        if (line.startsWith('+')) { addCount++; diffLines += '<div class="diff-line-add">' + escapeHtml(line.substring(1)) + '</div>'; }
+                        else if (line.startsWith('-')) { delCount++; diffLines += '<div class="diff-line-del">' + escapeHtml(line.substring(1)) + '</div>'; }
+                        else { diffLines += '<div class="diff-line-ctx">' + escapeHtml(line) + '</div>'; }
+                    }
+                    return '<div class="diff-block" id="' + diffId + '"><div class="diff-header"><span class="diff-file">' + (filePath || '变更') + '</span><div class="diff-actions"><button class="diff-accept" data-diff-id="' + diffId + '" data-file="' + filePath + '">接受</button><button class="diff-reject" data-diff-id="' + diffId + '">拒绝</button></div></div><div class="diff-content">' + diffLines + '</div></div>';
+                })
                 .replace(/\`\`\`(\\w*)\\n([\\s\\S]*?)\`\`\`/g, function(match, lang, code) {
                     const id = 'code-' + Math.random().toString(36).substr(2, 9);
                     return '<div class="code-block"><div class="code-header"><span class="code-lang">' + (lang || 'code') + '</span><div class="code-actions"><button class="copy-btn" data-code-id="' + id + '">复制</button><button class="insert-btn" data-code-id="' + id + '">插入</button></div></div><pre><code id="' + id + '">' + escapeHtml(code) + '</code></pre></div>';
@@ -960,6 +999,31 @@ npm run test
                     if (codeEl) {
                         vscode.postMessage({ type: 'insertCode', value: codeEl.textContent });
                     }
+                });
+            });
+            el.querySelectorAll('.diff-accept').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const diffId = btn.getAttribute('data-diff-id');
+                    const file = btn.getAttribute('data-file');
+                    const diffEl = document.getElementById(diffId);
+                    const content = diffEl ? diffEl.querySelector('.diff-content')?.textContent || '' : '';
+                    vscode.postMessage({ type: 'acceptDiff', value: diffId, filePath: file, content: content });
+                    btn.textContent = '✓ 已接受';
+                    btn.disabled = true;
+                    const rejectBtn = diffEl?.querySelector('.diff-reject');
+                    if (rejectBtn) rejectBtn.remove();
+                });
+            });
+            el.querySelectorAll('.diff-reject').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const diffId = btn.getAttribute('data-diff-id');
+                    const diffEl = document.getElementById(diffId);
+                    if (diffEl) diffEl.style.opacity = '0.4';
+                    vscode.postMessage({ type: 'rejectDiff', value: diffId });
+                    btn.textContent = '✗ 已拒绝';
+                    btn.disabled = true;
+                    const acceptBtn = diffEl?.querySelector('.diff-accept');
+                    if (acceptBtn) acceptBtn.remove();
                 });
             });
         }
@@ -1008,6 +1072,36 @@ npm run test
             if (streamMsg) streamMsg.remove();
             addMessage({ role: 'assistant', content: fullContent, timestamp: Date.now() });
             currentStreamContent = '';
+            const activeMode = document.querySelector('.mode-btn.active');
+            const currentMode = activeMode ? activeMode.dataset.mode : 'chat';
+            if (currentMode === 'builder' || currentMode === 'agent') {
+                const diffBlocks = document.querySelectorAll('.diff-block');
+                if (diffBlocks.length > 0) {
+                    let totalAdd = 0;
+                    let totalDel = 0;
+                    diffBlocks.forEach(block => {
+                        totalAdd += block.querySelectorAll('.diff-line-add').length;
+                        totalDel += block.querySelectorAll('.diff-line-del').length;
+                    });
+                    const summaryDiv = document.createElement('div');
+                    summaryDiv.className = 'summary-card';
+                    summaryDiv.innerHTML = '<div class="summary-title">变更摘要</div><div class="summary-stats"><span class="summary-stat"><span class="add">+' + totalAdd + ' 行</span></span><span class="summary-stat"><span class="del">-' + totalDel + ' 行</span></span><span class="summary-stat">' + diffBlocks.length + ' 个文件</span></div><div class="summary-actions"><button class="diff-accept" id="accept-all">全部接受</button><button class="diff-reject" id="reject-all">全部拒绝</button></div>';
+                    messagesEl.appendChild(summaryDiv);
+                    scrollToBottom();
+                    document.getElementById('accept-all')?.addEventListener('click', () => {
+                        diffBlocks.forEach(block => {
+                            const acceptBtn = block.querySelector('.diff-accept');
+                            if (acceptBtn && !acceptBtn.disabled) acceptBtn.click();
+                        });
+                    });
+                    document.getElementById('reject-all')?.addEventListener('click', () => {
+                        diffBlocks.forEach(block => {
+                            const rejectBtn = block.querySelector('.diff-reject');
+                            if (rejectBtn && !rejectBtn.disabled) rejectBtn.click();
+                        });
+                    });
+                }
+            }
         }
 
         function setLoading(loading) {

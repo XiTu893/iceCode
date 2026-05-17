@@ -39,6 +39,12 @@
     "configuration.maxHistoryItems.description": "保存的最大历史条目数",
     "configuration.mode.description": "AI 模式（chat/builder/agent）",
     "configuration.safetyPolicy.description": "安全策略（auto/manual/confirm）",
+    "configuration.mode.enumDescriptions.chat": "标准对话模式",
+    "configuration.mode.enumDescriptions.builder": "构建模式，输出 Diff 预览",
+    "configuration.mode.enumDescriptions.agent": "智能体模式，任务流时间线",
+    "configuration.safetyPolicy.enumDescriptions.auto": "自动执行所有工具调用",
+    "configuration.safetyPolicy.enumDescriptions.manual": "工具调用前显示确认提示",
+    "configuration.safetyPolicy.enumDescriptions.confirm": "每一步都需人工确认",
     "color.background.description": "IceCode AI 面板背景色",
     "color.accent.description": "IceCode AI 强调色"
 }
