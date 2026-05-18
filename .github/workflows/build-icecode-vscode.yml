@@ -54,28 +54,34 @@ jobs:
         run: |
           brew install pkg-config
 
+      - name: Ensure cgmanifest.json exists
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "vscode/cgmanifest.json")) {
+            Write-Host "Creating cgmanifest.json"
+            Set-Content -Path "vscode/cgmanifest.json" -Value '{"registrations":[],"version":1}' -Encoding UTF8
+          }
+
       - name: Install VSCode dependencies
         working-directory: vscode
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
-        run: npm ci 2>&1 || npm install --ignore-scripts
+        run: npm install --ignore-scripts
 
       - name: Install build dependencies
         working-directory: vscode/build
         run: npm install --ignore-scripts
-
-      - name: Compile VSCode (development build)
-        working-directory: vscode
-        run: npm run compile
-        env:
-          NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Build IceCode AI Extension
         working-directory: vscode/extensions/icecode-ai
         run: |
           npm install
           npm run compile
+
+      - name: Build IceCode Dark Theme Extension
+        working-directory: vscode/extensions/theme-icecode-dark
+        run: npm install --ignore-scripts || true
 
       - name: Build Windows client
         if: runner.os == 'Windows'
@@ -101,19 +107,27 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=8192
           VSCODE_ARCH: ${{ matrix.arch }}
 
+      - name: Locate build output
+        shell: pwsh
+        run: |
+          Write-Host "Searching for build output..."
+          $parentDir = Split-Path $PWD.Path
+          Get-ChildItem $parentDir -Depth 0 | Select-Object Name
+
       - name: Create ZIP (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $buildDir = Join-Path (Split-Path $PWD.Path) "VSCode-win32-${{ matrix.arch }}"
           if (Test-Path $buildDir) {
-            Compress-Archive -Path $buildDir -DestinationPath "IceCode-IDE-win-x64.zip"
+            Compress-Archive -Path $buildDir -DestinationPath "$PWD/IceCode-IDE-win-x64.zip"
             Write-Host "Packaged: $buildDir"
             Get-ChildItem $buildDir -Depth 0 | Select-Object Name
           } else {
             Write-Host "Build directory not found: $buildDir"
             $parentDir = Split-Path $PWD.Path
             Get-ChildItem $parentDir -Depth 0 | Select-Object Name
+            Write-Error "Build output not found!"
           }
 
       - name: Create TAR (Linux)
@@ -128,6 +142,7 @@ jobs:
           else
             echo "Build directory not found: $BUILD_DIR"
             ls -la .. | head -20
+            exit 1
           fi
 
       - name: Create ZIP (macOS)
@@ -142,6 +157,7 @@ jobs:
           else
             echo "Build directory not found: $BUILD_DIR"
             ls -la .. | head -20
+            exit 1
           fi
 
       - name: Upload artifact
