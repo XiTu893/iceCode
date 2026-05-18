@@ -69,14 +69,12 @@ jobs:
           GYP_MSVS_VERSION: '2022'
         run: npm install --ignore-scripts
 
+      - name: Rebuild native modules (esbuild, electron, etc.)
+        working-directory: vscode
+        run: npm rebuild
+
       - name: Install build dependencies
         working-directory: vscode/build
-        env:
-          GYP_MSVS_VERSION: '2022'
-        run: npm install
-
-      - name: Install remote dependencies
-        working-directory: vscode/remote
         env:
           GYP_MSVS_VERSION: '2022'
         run: npm install
