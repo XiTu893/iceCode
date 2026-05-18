@@ -67,21 +67,14 @@ jobs:
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
-        run: npm install --ignore-scripts
-
-      - name: Install build dependencies
-        working-directory: vscode/build
-        run: npm install --ignore-scripts
+          VSCODE_FORCE_INSTALL: '1'
+        run: npm install
 
       - name: Build IceCode AI Extension
         working-directory: vscode/extensions/icecode-ai
         run: |
           npm install
           npm run compile
-
-      - name: Build IceCode Dark Theme Extension
-        working-directory: vscode/extensions/theme-icecode-dark
-        run: npm install --ignore-scripts || true
 
       - name: Build Windows client
         if: runner.os == 'Windows'
