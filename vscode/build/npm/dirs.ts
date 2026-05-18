@@ -3,11 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { existsSync } from 'fs';
-
-/**
- * Complete list of directories where npm should be executed to install node modules
- */
 export const dirs = [
 	'',
 	'build',
@@ -15,7 +10,6 @@ export const dirs = [
 	'build/vite',
 	'extensions',
 	'extensions/configuration-editing',
-	'extensions/copilot',
 	'extensions/css-language-features',
 	'extensions/css-language-features/server',
 	'extensions/debug-auto-launch',
@@ -49,25 +43,5 @@ export const dirs = [
 	'extensions/tunnel-forwarding',
 	'extensions/terminal-suggest',
 	'extensions/typescript-language-features',
-	'extensions/vscode-api-tests',
-	'extensions/vscode-colorize-tests',
-	'extensions/vscode-colorize-perf-tests',
-	'extensions/vscode-test-resolver',
-	'remote',
-	'remote/web',
-	'test/automation',
-	'test/integration/browser',
-	'test/monaco',
-	'test/smoke',
-	'test/mcp',
-	'.vscode/extensions/vscode-selfhost-import-aid',
-	'.vscode/extensions/vscode-selfhost-test-provider',
-	'.vscode/extensions/vscode-extras',
-	'.vscode/extensions/vscode-pr-pinger',
+	'extensions/icecode-ai',
 ];
-
-if (existsSync(`${import.meta.dirname}/../../.build/distro/npm`)) {
-	dirs.push('.build/distro/npm');
-	dirs.push('.build/distro/npm/remote');
-	dirs.push('.build/distro/npm/remote/web');
-}

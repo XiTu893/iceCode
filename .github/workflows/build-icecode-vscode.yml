@@ -62,27 +62,14 @@ jobs:
             Set-Content -Path "vscode/cgmanifest.json" -Value '{"registrations":[],"version":1}' -Encoding UTF8
           }
 
-      - name: Install VSCode root dependencies
+      - name: Install all dependencies
         working-directory: vscode
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
-        run: npm install --ignore-scripts
-
-      - name: Run esbuild install
-        working-directory: vscode
-        run: node node_modules/esbuild/install.js
-
-      - name: Install build dependencies
-        working-directory: vscode/build
-        env:
-          GYP_MSVS_VERSION: '2022'
+          VSCODE_FORCE_INSTALL: '1'
+          npm_command: 'install'
         run: npm install
-
-      - name: Install extension dependencies
-        working-directory: vscode/extensions
-        run: npm install
-        continue-on-error: true
 
       - name: Build IceCode AI Extension
         working-directory: vscode/extensions/icecode-ai
