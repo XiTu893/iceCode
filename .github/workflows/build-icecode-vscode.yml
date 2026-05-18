@@ -62,14 +62,72 @@ jobs:
             Set-Content -Path "vscode/cgmanifest.json" -Value '{"registrations":[],"version":1}' -Encoding UTF8
           }
 
-      - name: Install all dependencies
+      - name: Install VSCode root dependencies
         working-directory: vscode
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
-          VSCODE_FORCE_INSTALL: '1'
-          npm_command: 'install'
+        run: npm install --ignore-scripts
+
+      - name: Install build dependencies (with esbuild)
+        working-directory: vscode/build
+        env:
+          GYP_MSVS_VERSION: '2022'
         run: npm install
+
+      - name: Install extension dependencies
+        working-directory: vscode/extensions
+        run: npm install
+        continue-on-error: true
+
+      - name: Install individual extension dependencies
+        working-directory: vscode
+        shell: pwsh
+        run: |
+          $extDirs = @(
+            'configuration-editing',
+            'css-language-features',
+            'css-language-features/server',
+            'debug-auto-launch',
+            'debug-server-ready',
+            'emmet',
+            'extension-editing',
+            'git',
+            'git-base',
+            'github',
+            'github-authentication',
+            'html-language-features',
+            'html-language-features/server',
+            'ipynb',
+            'json-language-features',
+            'json-language-features/server',
+            'markdown-language-features',
+            'markdown-math',
+            'media-preview',
+            'merge-conflict',
+            'microsoft-authentication',
+            'notebook-renderers',
+            'npm',
+            'php-language-features',
+            'references-view',
+            'search-result',
+            'simple-browser',
+            'terminal-suggest',
+            'types',
+            'typescript-language-features',
+            'icecode-ai'
+          )
+          foreach ($dir in $extDirs) {
+            $fullPath = Join-Path "extensions" $dir
+            if (Test-Path $fullPath) {
+              Write-Host "Installing dependencies for $fullPath..."
+              Push-Location $fullPath
+              npm install 2>&1 | Write-Host
+              Pop-Location
+            } else {
+              Write-Host "Skipping $fullPath (not found)"
+            }
+          }
 
       - name: Build IceCode AI Extension
         working-directory: vscode/extensions/icecode-ai
