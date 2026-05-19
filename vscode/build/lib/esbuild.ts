@@ -13,7 +13,7 @@ const root = path.resolve(import.meta.dirname, '../..');
 export function runEsbuildTranspile(outDir: string, excludeTests: boolean): Promise<void> {
 	return new Promise((resolve, reject) => {
 		const scriptPath = path.join(root, 'build/next/index.ts');
-		const args = [scriptPath, 'transpile', '--out', outDir];
+		const args = ['--max-old-space-size=8192', scriptPath, 'transpile', '--out', outDir];
 		if (excludeTests) {
 			args.push('--exclude-tests');
 		}
@@ -37,7 +37,7 @@ export function runEsbuildTranspile(outDir: string, excludeTests: boolean): Prom
 export function runEsbuildBundle(outDir: string, minify: boolean, nls: boolean, target: 'desktop' | 'server' | 'server-web' = 'desktop', sourceMapBaseUrl?: string): Promise<void> {
 	return new Promise((resolve, reject) => {
 		const scriptPath = path.join(root, 'build/next/index.ts');
-		const args = [scriptPath, 'bundle', '--out', outDir, '--target', target];
+		const args = ['--max-old-space-size=8192', scriptPath, 'bundle', '--out', outDir, '--target', target];
 		if (minify) {
 			args.push('--minify');
 			args.push('--mangle-privates');
