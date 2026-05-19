@@ -100,6 +100,9 @@ async function npmInstallAsync(dir: string, opts?: child_process.SpawnOptions): 
 
 function setNpmrcConfig(dir: string, env: NodeJS.ProcessEnv) {
 	const npmrcPath = path.join(root, dir, '.npmrc');
+	if (!fs.existsSync(npmrcPath)) {
+		return;
+	}
 	const lines = fs.readFileSync(npmrcPath, 'utf8').split('\n');
 
 	for (const line of lines) {
@@ -182,12 +185,15 @@ function clearInheritedNpmrcConfig(dir: string, env: NodeJS.ProcessEnv): void {
 	}
 }
 
-function ensureAgentHarnessLink(sourceRelativePath: string, linkPath: string): 'existing' | 'junction' | 'symlink' | 'hard link' {
+function ensureAgentHarnessLink(sourceRelativePath: string, linkPath: string): 'existing' | 'junction' | 'symlink' | 'hard link' | 'skipped' {
 	if (fs.existsSync(linkPath)) {
 		return 'existing';
 	}
 
 	const sourcePath = path.resolve(path.dirname(linkPath), sourceRelativePath);
+	if (!fs.existsSync(sourcePath)) {
+		return 'skipped';
+	}
 	const isDirectory = fs.statSync(sourcePath).isDirectory();
 
 	try {
@@ -236,8 +242,8 @@ async function runWithConcurrency(tasks: (() => Promise<void>)[], concurrency: n
 async function main() {
 	if (!process.env['VSCODE_FORCE_INSTALL'] && isUpToDate()) {
 		log('.', 'All dependencies up to date, skipping postinstall.');
-		child_process.execSync('git config pull.rebase merges');
-		child_process.execSync('git config blame.ignoreRevsFile .git-blame-ignore-revs');
+		try { child_process.execSync('git config pull.rebase merges'); } catch { /* ignore */ }
+		try { child_process.execSync('git config blame.ignoreRevsFile .git-blame-ignore-revs'); } catch { /* ignore */ }
 		return;
 	}
 
@@ -309,8 +315,8 @@ async function main() {
 	log('.', `Running ${parallelTasks.length} npm installs with concurrency ${concurrency}...`);
 	await runWithConcurrency(parallelTasks, concurrency);
 
-	child_process.execSync('git config pull.rebase merges');
-	child_process.execSync('git config blame.ignoreRevsFile .git-blame-ignore-revs');
+	try { child_process.execSync('git config pull.rebase merges'); } catch { /* ignore */ }
+	try { child_process.execSync('git config blame.ignoreRevsFile .git-blame-ignore-revs'); } catch { /* ignore */ }
 
 	fs.writeFileSync(stateFile, JSON.stringify(_state));
 	fs.writeFileSync(stateContentsFile, JSON.stringify(computeContents()));
