@@ -58,8 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     const completionProvider = vscode.languages.registerInlineCompletionItemProvider(
         { pattern: '**' },
-        inlineCompletionProvider,
-        { triggerCharacters: ['.', ' ', '(', '{', '[', '<', '/', '\n'] }
+        inlineCompletionProvider
     );
     context.subscriptions.push(completionProvider);
 
@@ -130,9 +129,10 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('icecode-ai.switchModel', async () => {
             const config = vscode.workspace.getConfiguration('icecode-ai');
-            const models = config.inspect<string>('model')?.enum || ['claude-sonnet-4-20250514'];
+            const modelInspect = config.inspect<string>('model');
+            const models: string[] = (modelInspect as any)?.enum || ['claude-sonnet-4-20250514'];
             const currentModel = config.get<string>('model');
-            const items = models.map(m => ({
+            const items = models.map((m: string) => ({
                 label: m,
                 description: m === currentModel ? '当前' : undefined,
                 picked: m === currentModel

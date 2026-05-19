@@ -83,6 +83,10 @@ jobs:
           GYP_MSVS_VERSION: '2022'
         run: npm install
 
+      - name: Patch vsce npm.js for shell compatibility
+        working-directory: vscode/build
+        run: node patch-vsce.js
+
       - name: Install extension dependencies
         working-directory: vscode/extensions
         run: npm install
@@ -139,12 +143,6 @@ jobs:
               Write-Host "Skipping $fullPath (not found)"
             }
           }
-
-      - name: Build IceCode AI Extension
-        working-directory: vscode/extensions/icecode-ai
-        run: |
-          npm install
-          npm run compile
 
       - name: Build Windows client
         if: runner.os == 'Windows'

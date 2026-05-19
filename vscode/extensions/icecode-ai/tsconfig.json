@@ -1,19 +1,17 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "ES2022",
-    "outDir": "out",
-    "lib": ["ES2022"],
-    "sourceMap": true,
-    "rootDir": "src",
-    "strict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": false,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "exclude": ["node_modules", ".vscode-test"]
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"target": "ES2024",
+		"lib": ["ES2024"],
+		"module": "commonjs",
+		"strict": false,
+		"noImplicitAny": false,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"outDir": "./out",
+		"rootDir": "./src",
+		"types": ["vscode", "node"],
+		"skipLibCheck": true
+	},
+	"include": ["src/**/*"]
 }

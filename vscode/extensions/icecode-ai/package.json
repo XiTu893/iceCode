@@ -309,6 +309,7 @@
     "watch": "esbuild src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node20 --watch --sourcemap"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "@types/vscode": "^1.90.0",
     "esbuild": "^0.24.0",
     "typescript": "^5.7.0"

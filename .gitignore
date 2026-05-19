@@ -23,6 +23,7 @@ vscode/build/node_modules/
 vscode/build/out/
 vscode/extensions/*/node_modules/
 vscode/extensions/*/out/
+vscode/extensions/*/dist/
 vscode/.product.json
 vscode/package-lock.json
 vscode/**/node_modules/
