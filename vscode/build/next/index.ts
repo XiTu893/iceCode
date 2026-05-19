@@ -825,8 +825,8 @@ ${tslib}`,
 	// Create the file content mapper plugin (injects product config, builtin extensions)
 	const contentMapperPlugin = fileContentMapperPlugin(outDir, target);
 
-	// Bundle each entry point directly from TypeScript source
-	await Promise.all(allEntryPoints.map(async (entryPoint) => {
+	// Bundle each entry point directly from TypeScript source (sequentially to reduce peak memory)
+	for (const entryPoint of allEntryPoints) {
 		const entryPath = path.join(REPO_ROOT, SRC_DIR, `${entryPoint}.ts`);
 		const outPath = path.join(REPO_ROOT, outDir, `${entryPoint}.js`);
 
@@ -881,7 +881,7 @@ ${tslib}`,
 		const result = await esbuild.build(buildOptions);
 
 		buildResults.push({ outPath, result });
-	}));
+	}
 
 	// Bundle bootstrap files (with minimist inlined) directly from TypeScript source
 	for (const entry of bootstrapEntryPoints) {
