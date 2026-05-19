@@ -149,26 +149,23 @@ jobs:
       - name: Build Windows client
         if: runner.os == 'Windows'
         working-directory: vscode
-        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-win32-${{ matrix.arch }}" 2>&1
+        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-win32-${{ matrix.arch }}"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
-          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Build Linux client
         if: runner.os == 'Linux'
         working-directory: vscode
-        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-linux-${{ matrix.arch }}" 2>&1
+        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-linux-${{ matrix.arch }}"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
-          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Build macOS client
         if: runner.os == 'macOS'
         working-directory: vscode
-        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-darwin-${{ matrix.arch }}" 2>&1
+        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-darwin-${{ matrix.arch }}"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
-          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Locate build output
         shell: pwsh
