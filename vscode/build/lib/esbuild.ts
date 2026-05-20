@@ -23,9 +23,27 @@ export function runEsbuildTranspile(outDir: string, excludeTests: boolean): Prom
 			stdio: 'inherit'
 		});
 
-		proc.on('error', reject);
+		const TIMEOUT_MS = 10 * 60 * 1000;
+		let timedOut = false;
+		const timer = setTimeout(() => {
+			timedOut = true;
+			console.error(`esbuild transpile timed out after ${TIMEOUT_MS / 1000}s (outDir: ${outDir}), killing...`);
+			try {
+				proc.kill('SIGKILL');
+			} catch {
+				// ignore
+			}
+		}, TIMEOUT_MS);
+
+		proc.on('error', err => {
+			clearTimeout(timer);
+			reject(err);
+		});
 		proc.on('close', code => {
-			if (code === 0) {
+			clearTimeout(timer);
+			if (timedOut) {
+				reject(new Error(`esbuild transpile timed out after ${TIMEOUT_MS / 1000}s (outDir: ${outDir})`));
+			} else if (code === 0) {
 				resolve();
 			} else {
 				reject(new Error(`esbuild transpile failed with exit code ${code} (outDir: ${outDir})`));
@@ -54,9 +72,27 @@ export function runEsbuildBundle(outDir: string, minify: boolean, nls: boolean, 
 			stdio: 'inherit'
 		});
 
-		proc.on('error', reject);
+		const TIMEOUT_MS = 10 * 60 * 1000;
+		let timedOut = false;
+		const timer = setTimeout(() => {
+			timedOut = true;
+			console.error(`esbuild bundle timed out after ${TIMEOUT_MS / 1000}s (outDir: ${outDir}, target: ${target}), killing...`);
+			try {
+				proc.kill('SIGKILL');
+			} catch {
+				// ignore
+			}
+		}, TIMEOUT_MS);
+
+		proc.on('error', err => {
+			clearTimeout(timer);
+			reject(err);
+		});
 		proc.on('close', code => {
-			if (code === 0) {
+			clearTimeout(timer);
+			if (timedOut) {
+				reject(new Error(`esbuild bundle timed out after ${TIMEOUT_MS / 1000}s (outDir: ${outDir}, target: ${target})`));
+			} else if (code === 0) {
 				resolve();
 			} else {
 				reject(new Error(`esbuild bundle failed with exit code ${code} (outDir: ${outDir}, minify: ${minify}, nls: ${nls}, target: ${target})`));

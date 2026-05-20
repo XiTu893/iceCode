@@ -24,12 +24,15 @@ jobs:
           - os: windows-latest
             platform: win-x64
             arch: x64
+            gulp_target: vscode-win32-x64-min
           - os: ubuntu-latest
             platform: linux-x64
             arch: x64
+            gulp_target: vscode-linux-x64-min
           - os: macos-latest
             platform: darwin-arm64
             arch: arm64
+            gulp_target: vscode-darwin-arm64-min
 
     steps:
       - name: Checkout code
@@ -40,7 +43,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version-file: 'vscode/.nvmrc'
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -74,6 +77,14 @@ jobs:
             Write-Host "Removed copilot extension"
           }
 
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: vscode/node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('vscode/package.json') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-
+
       - name: Cache built-in extensions
         uses: actions/cache@v4
         with:
@@ -91,36 +102,15 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
           VSCODE_FORCE_INSTALL: '1'
-        run: npm install
+        run: npm install --no-fund --no-audit 2>&1 || npm install --no-fund --no-audit 2>&1
 
       - name: Patch vsce npm.js for shell compatibility
         working-directory: vscode/build
         run: node patch-vsce.js
 
-      - name: Compile (core-ci)
+      - name: Build client
         working-directory: vscode
-        run: npm run gulp core-ci
-        env:
-          VSCODE_ARCH: ${{ matrix.arch }}
-
-      - name: Package Windows client
-        if: runner.os == 'Windows'
-        working-directory: vscode
-        run: npm run gulp "vscode-win32-${{ matrix.arch }}-min-ci"
-        env:
-          VSCODE_ARCH: ${{ matrix.arch }}
-
-      - name: Package Linux client
-        if: runner.os == 'Linux'
-        working-directory: vscode
-        run: npm run gulp "vscode-linux-${{ matrix.arch }}-min-ci"
-        env:
-          VSCODE_ARCH: ${{ matrix.arch }}
-
-      - name: Package macOS client
-        if: runner.os == 'macOS'
-        working-directory: vscode
-        run: npm run gulp "vscode-darwin-${{ matrix.arch }}-min-ci"
+        run: npm run gulp "${{ matrix.gulp_target }}"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
 

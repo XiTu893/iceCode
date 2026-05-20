@@ -21,7 +21,7 @@ import vfs from 'vinyl-fs';
 import packageJson from '../package.json' with { type: 'json' };
 import flatmap from 'gulp-flatmap';
 import gunzip from 'gulp-gunzip';
-import { untar } from './lib/util.ts';
+import { untar, VinylStat } from './lib/util.ts';
 import File from 'vinyl';
 import * as fs from 'fs';
 import glob from 'glob';
@@ -167,7 +167,7 @@ function extractAlpinefromDocker(nodeVersion: string, platform: string, arch: st
 	log(`Downloading node.js ${nodeVersion} ${platform} ${arch} from docker image ${imageName}`);
 	const contents = cp.execSync(`docker run --rm ${imageName}:${nodeVersion}-alpine /bin/sh -c 'cat \`which node\`'`, { maxBuffer: 100 * 1024 * 1024, encoding: 'buffer' });
 	// eslint-disable-next-line local/code-no-dangerous-type-assertions
-	return es.readArray([new File({ path: 'node', contents, stat: { mode: parseInt('755', 8) } as fs.Stats })]);
+	return es.readArray([new File({ path: 'node', contents, stat: new VinylStat({ mode: parseInt('755', 8) }) })]);
 }
 
 const { nodeVersion, internalNodeVersion } = getNodeVersion();

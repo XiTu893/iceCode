@@ -46,10 +46,8 @@ async function _execute(task: Task): Promise<void> {
 }
 
 async function _doExecute(task: Task): Promise<void> {
-	// Always invoke as if it were a callback task
 	return new Promise((resolve, reject) => {
 		if (task.length === 1) {
-			// this is a callback task
 			task((err) => {
 				if (err) {
 					return reject(err);
@@ -62,20 +60,29 @@ async function _doExecute(task: Task): Promise<void> {
 		const taskResult = task();
 
 		if (typeof taskResult === 'undefined') {
-			// this is a sync task
 			resolve();
 			return;
 		}
 
 		if (_isPromise(taskResult)) {
-			// this is a promise returning task
 			taskResult.then(resolve, reject);
 			return;
 		}
 
-		// this is a stream returning task
-		taskResult.on('end', _ => resolve());
-		taskResult.on('error', err => reject(err));
+		let resolved = false;
+		const finish = (err?: Error) => {
+			if (resolved) return;
+			resolved = true;
+			if (err) {
+				reject(err);
+			} else {
+				resolve();
+			}
+		};
+
+		taskResult.on('end', () => finish());
+		taskResult.on('error', (err: Error) => finish(err));
+		taskResult.on('finish', () => finish());
 	});
 }
 

@@ -145,6 +145,7 @@ export function typeCheckExtensionStream(extensionPath: string, forWeb: boolean)
 function fromLocalNormal(extensionPath: string): Stream {
 	const vsce = require('@vscode/vsce') as typeof import('@vscode/vsce');
 	const result = es.through();
+	let ended = false;
 
 	const packageJsonPath = path.join(extensionPath, 'package.json');
 	const hasDependencies = (() => {
@@ -159,6 +160,15 @@ function fromLocalNormal(extensionPath: string): Stream {
 
 	const packageManager = hasDependencies ? vsce.PackageManager.Npm : vsce.PackageManager.None;
 
+	const finish = (err?: Error) => {
+		if (ended) return;
+		ended = true;
+		if (err) {
+			result.emit('error', err);
+		}
+		result.emit('end');
+	};
+
 	vsce.listFiles({ cwd: extensionPath, packageManager })
 		.then(fileNames => {
 			const files = fileNames
@@ -171,9 +181,20 @@ function fromLocalNormal(extensionPath: string): Stream {
 					contents: fs.createReadStream(filePath)
 				}));
 
-			es.readArray(files).pipe(result);
+			if (files.length === 0) {
+				finish();
+				return;
+			}
+
+			const reader = es.readArray(files);
+			reader.on('error', (err: Error) => finish(err));
+			reader.on('end', () => {
+				if (ended) return;
+				ended = true;
+			});
+			reader.pipe(result, { end: true });
 		})
-		.catch(err => result.emit('error', err));
+		.catch(err => finish(err instanceof Error ? err : new Error(String(err))));
 
 	return result.pipe(createStatsStream(path.basename(extensionPath)));
 }
@@ -182,6 +203,7 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 	const vsce = require('@vscode/vsce') as typeof import('@vscode/vsce');
 	const result = es.through();
 	const extensionName = path.basename(extensionPath);
+	let ended = false;
 
 	const packagedDependenciesByExtension: Record<string, string[]> = {
 		'git': ['@vscode/fs-copyfile']
@@ -189,6 +211,15 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 	const packagedDependencies = packagedDependenciesByExtension[extensionName] ?? [];
 
 	const esbuildScript = path.join(extensionPath, esbuildConfigFileName);
+
+	const finish = (err?: Error) => {
+		if (ended) return;
+		ended = true;
+		if (err) {
+			result.emit('error', err);
+		}
+		result.emit('end');
+	};
 
 	new Promise<void>((resolve, reject) => {
 		const proc = cp.execFile(process.argv[0], [esbuildScript], { cwd: extensionPath }, (error, _stdout, stderr) => {
@@ -239,12 +270,20 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 
 		if (files.length === 0) {
 			fancyLog(`[fromLocalEsbuild] Warning: No files collected for ${extensionName}`);
+			finish();
+			return;
 		}
 
-		es.readArray(files).pipe(result);
+		const reader = es.readArray(files);
+		reader.on('error', (err: Error) => finish(err));
+		reader.on('end', () => {
+			if (ended) return;
+			ended = true;
+		});
+		reader.pipe(result, { end: true });
 	}).catch(err => {
 		console.error(`[fromLocalEsbuild] Error processing ${extensionPath}: ${err}`);
-		result.emit('error', err);
+		finish(err instanceof Error ? err : new Error(String(err)));
 	});
 
 	return result.pipe(createStatsStream(path.basename(extensionPath)));

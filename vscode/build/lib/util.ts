@@ -131,8 +131,7 @@ export function fixWin32DirectoryPermissions(): NodeJS.ReadWriteStream {
 export function setExecutableBit(pattern?: string | string[]): NodeJS.ReadWriteStream {
 	const setBit = es.mapSync<VinylFile, VinylFile>(f => {
 		if (!f.stat) {
-			const stat: Pick<fs.Stats, 'isFile' | 'mode'> = { isFile() { return true; }, mode: 0 };
-			f.stat = stat as fs.Stats;
+			f.stat = new VinylStat({ mode: 0 });
 		}
 		f.stat!.mode = /* 100755 */ 33261;
 		return f;

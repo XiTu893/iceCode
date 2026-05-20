@@ -46,8 +46,35 @@ export function spawnTsgo(projectPath: string, config: { taskName: string; noEmi
 		stderrData += data.toString();
 	});
 
+	const TIMEOUT_MS = 5 * 60 * 1000;
+	let timedOut = false;
+	const timer = setTimeout(() => {
+		timedOut = true;
+		fancyLog(`${ansiColors.yellow('warning')}: tsgo timed out after ${TIMEOUT_MS / 1000}s for ${projectPath}, killing...`);
+		try {
+			child.kill('SIGKILL');
+		} catch {
+			// ignore
+		}
+	}, TIMEOUT_MS);
+
 	return new Promise<void>((resolve, reject) => {
+		const cleanup = () => {
+			clearTimeout(timer);
+		};
+
 		child.on('exit', code => {
+			cleanup();
+			if (timedOut) {
+				if (config.noEmit) {
+					fancyLog(`${ansiColors.yellow('warning')}: tsgo timed out for ${projectPath}, continuing...`);
+					resolve();
+				} else {
+					reject(new Error(`tsgo timed out after ${TIMEOUT_MS / 1000}s for ${projectPath}`));
+				}
+				return;
+			}
+
 			const allOutput = stdoutData + '\n' + stderrData;
 			const lines = allOutput
 				.split(/\r?\n/)
@@ -69,6 +96,7 @@ export function spawnTsgo(projectPath: string, config: { taskName: string; noEmi
 		});
 
 		child.on('error', err => {
+			cleanup();
 			if (config.noEmit) {
 				fancyLog(`${ansiColors.yellow('warning')}: tsgo failed to start: ${err}, continuing...`);
 				resolve();
