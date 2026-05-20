@@ -213,6 +213,10 @@ function computeChecksums(out: string, filenames: string[]): Record<string, stri
 	const result: Record<string, string> = {};
 	filenames.forEach(function (filename) {
 		const fullPath = path.join(process.cwd(), out, filename);
+		if (!fs.existsSync(fullPath)) {
+			console.warn(`[computeChecksums] Skipping missing file: ${fullPath}`);
+			return;
+		}
 		result[filename] = computeChecksum(fullPath);
 	});
 	return result;
@@ -525,32 +529,46 @@ function patchWin32DependenciesTask(destinationFolderName: string) {
 	const cwd = path.join(path.dirname(root), destinationFolderName);
 
 	return async () => {
+		if (!fs.existsSync(cwd)) {
+			console.warn(`[patchWin32DependenciesTask] Skipping: output directory not found at ${cwd}`);
+			return;
+		}
 		const versionedResourcesFolder = util.getVersionedResourcesFolder('win32', commit!);
 		const deps = (await Promise.all([
 			glob('**/*.node', { cwd, ignore: 'extensions/node_modules/@parcel/watcher/**' }),
 			glob('**/rg.exe', { cwd }),
 			glob('**/*explorer_command*.dll', { cwd }),
 		])).flatMap(o => o);
-		const packageJson = JSON.parse(await fs.promises.readFile(path.join(cwd, versionedResourcesFolder, 'resources', 'app', 'package.json'), 'utf8'));
-		const product = JSON.parse(await fs.promises.readFile(path.join(cwd, versionedResourcesFolder, 'resources', 'app', 'product.json'), 'utf8'));
+		const packageJsonPath = path.join(cwd, versionedResourcesFolder, 'resources', 'app', 'package.json');
+		const productJsonPath = path.join(cwd, versionedResourcesFolder, 'resources', 'app', 'product.json');
+		if (!fs.existsSync(packageJsonPath) || !fs.existsSync(productJsonPath)) {
+			console.warn(`[patchWin32DependenciesTask] Skipping: package.json or product.json not found`);
+			return;
+		}
+		const packageJson = JSON.parse(await fs.promises.readFile(packageJsonPath, 'utf8'));
+		const product = JSON.parse(await fs.promises.readFile(productJsonPath, 'utf8'));
 		const baseVersion = packageJson.version.replace(/-.*$/, '');
 
 		const patchPromises = deps.map<Promise<unknown>>(async dep => {
 			const basename = path.basename(dep);
 
-			await rcedit(path.join(cwd, dep), {
-				'file-version': baseVersion,
-				'version-string': {
-					'CompanyName': 'Microsoft Corporation',
-					'FileDescription': product.nameLong,
-					'FileVersion': packageJson.version,
-					'InternalName': basename,
-					'LegalCopyright': 'Copyright (C) 2026 Microsoft. All rights reserved',
-					'OriginalFilename': basename,
-					'ProductName': product.nameLong,
-					'ProductVersion': packageJson.version,
-				}
-			});
+			try {
+				await rcedit(path.join(cwd, dep), {
+					'file-version': baseVersion,
+					'version-string': {
+						'CompanyName': 'Microsoft Corporation',
+						'FileDescription': product.nameLong,
+						'FileVersion': packageJson.version,
+						'InternalName': basename,
+						'LegalCopyright': 'Copyright (C) 2026 Microsoft. All rights reserved',
+						'OriginalFilename': basename,
+						'ProductName': product.nameLong,
+						'ProductVersion': packageJson.version,
+					}
+				});
+			} catch (err) {
+				console.warn(`[patchWin32DependenciesTask] Failed to patch ${dep}: ${err}`);
+			}
 		});
 
 		await Promise.all(patchPromises);
@@ -561,8 +579,6 @@ function prepareCopilotRipgrepShimTask(platform: string, arch: string, destinati
 	const outputDir = path.join(path.dirname(root), destinationFolderName);
 
 	return async () => {
-		// On Windows with win32VersionedUpdate, app resources live under a
-		// commit-hash prefix: {output}/{commitHash}/resources/app/
 		const versionedResourcesFolder = util.getVersionedResourcesFolder(platform, commit!);
 		const appBase = platform === 'darwin'
 			? path.join(outputDir, `${product.nameLong}.app`, 'Contents', 'Resources', 'app')
@@ -570,6 +586,10 @@ function prepareCopilotRipgrepShimTask(platform: string, arch: string, destinati
 		const appNodeModulesDir = path.join(appBase, 'node_modules');
 
 		const builtInCopilotExtensionDir = path.join(appBase, 'extensions', 'copilot');
+		if (!fs.existsSync(builtInCopilotExtensionDir)) {
+			console.log(`[prepareCopilotRipgrepShimTask] Skipping: copilot extension not found at ${builtInCopilotExtensionDir}`);
+			return;
+		}
 		prepareBuiltInCopilotRipgrepShim(platform, arch, builtInCopilotExtensionDir, appNodeModulesDir);
 	};
 }

@@ -76,6 +76,7 @@ jobs:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
           VSCODE_FORCE_INSTALL: '1'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm install
 
       - name: Patch vsce npm.js for shell compatibility
@@ -88,6 +89,8 @@ jobs:
         run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-win32-${{ matrix.arch }}"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Build Linux client
         if: runner.os == 'Linux'
@@ -95,6 +98,8 @@ jobs:
         run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-linux-${{ matrix.arch }}"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Build macOS client
         if: runner.os == 'macOS'
@@ -102,6 +107,8 @@ jobs:
         run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-darwin-${{ matrix.arch }}"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Locate build output
         shell: pwsh

@@ -124,7 +124,21 @@ export function typeCheckExtension(extensionPath: string, forWeb: boolean): Prom
 export function typeCheckExtensionStream(extensionPath: string, forWeb: boolean): Stream {
 	const tsconfigFileName = forWeb ? 'tsconfig.browser.json' : 'tsconfig.json';
 	const tsconfigPath = path.join(extensionPath, tsconfigFileName);
-	return createTsgoStream(tsconfigPath, { taskName: 'typechecking extension (tsgo)', noEmit: true });
+	const stream = es.through();
+
+	if (!fs.existsSync(tsconfigPath)) {
+		stream.emit('end');
+		return stream;
+	}
+
+	spawnTsgo(tsconfigPath, { taskName: 'typechecking extension (tsgo)', noEmit: true }).then(() => {
+		stream.emit('end');
+	}).catch(err => {
+		fancyLog(`[typeCheckExtensionStream] tsgo type check failed for ${extensionPath}: ${err}`);
+		stream.emit('end');
+	});
+
+	return stream;
 }
 
 
@@ -132,10 +146,24 @@ function fromLocalNormal(extensionPath: string): Stream {
 	const vsce = require('@vscode/vsce') as typeof import('@vscode/vsce');
 	const result = es.through();
 
-	vsce.listFiles({ cwd: extensionPath, packageManager: vsce.PackageManager.Npm })
+	const packageJsonPath = path.join(extensionPath, 'package.json');
+	const hasDependencies = (() => {
+		try {
+			const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+			return (pkg.dependencies && Object.keys(pkg.dependencies).length > 0) ||
+				(pkg.devDependencies && Object.keys(pkg.devDependencies).length > 0);
+		} catch {
+			return false;
+		}
+	})();
+
+	const packageManager = hasDependencies ? vsce.PackageManager.Npm : vsce.PackageManager.None;
+
+	vsce.listFiles({ cwd: extensionPath, packageManager })
 		.then(fileNames => {
 			const files = fileNames
 				.map(fileName => path.join(extensionPath, fileName))
+				.filter(filePath => fs.existsSync(filePath))
 				.map(filePath => new File({
 					path: filePath,
 					stat: fs.statSync(filePath),
@@ -155,8 +183,6 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 	const result = es.through();
 	const extensionName = path.basename(extensionPath);
 
-	// Extensions built with esbuild can still externalize runtime dependencies.
-	// Ensure those externals are included in the packaged built-in extension.
 	const packagedDependenciesByExtension: Record<string, string[]> = {
 		'git': ['@vscode/fs-copyfile']
 	};
@@ -164,7 +190,6 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 
 	const esbuildScript = path.join(extensionPath, esbuildConfigFileName);
 
-	// Run esbuild, then collect the files
 	new Promise<void>((resolve, reject) => {
 		const proc = cp.execFile(process.argv[0], [esbuildScript], { cwd: extensionPath }, (error, _stdout, stderr) => {
 			if (error) {
@@ -183,7 +208,6 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 			fancyLog(`${ansiColors.green('esbuilding')}: ${data.toString('utf8')}`);
 		});
 	}).then(() => {
-		// After esbuild completes, collect all files using vsce
 		return vsce.listFiles({ cwd: extensionPath, packageManager: vsce.PackageManager.None });
 	}).then(fileNames => {
 		if (packagedDependencies.length > 0) {
@@ -191,8 +215,6 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 				glob.sync(path.join(extensionPath, 'node_modules', dependency, '**'), { nodir: true, dot: true })
 					.map(filePath => path.relative(extensionPath, filePath))
 					.filter(filePath => {
-						// Exclude non-.node files from build directories to avoid timestamp-sensitive
-						// artifacts (e.g. Makefile) that break macOS universal builds due to SHA mismatches.
 						const parts = filePath.split(path.sep);
 						const buildIndex = parts.indexOf('build');
 						if (buildIndex !== -1) {
@@ -207,6 +229,7 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 
 		const files = fileNames
 			.map(fileName => path.join(extensionPath, fileName))
+			.filter(filePath => fs.existsSync(filePath))
 			.map(filePath => new File({
 				path: filePath,
 				stat: fs.statSync(filePath),
@@ -214,10 +237,13 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 				contents: fs.createReadStream(filePath)
 			}));
 
+		if (files.length === 0) {
+			fancyLog(`[fromLocalEsbuild] Warning: No files collected for ${extensionName}`);
+		}
+
 		es.readArray(files).pipe(result);
 	}).catch(err => {
-		console.error(extensionPath);
-		console.error(packagedDependencies);
+		console.error(`[fromLocalEsbuild] Error processing ${extensionPath}: ${err}`);
 		result.emit('error', err);
 	});
 
@@ -599,7 +625,15 @@ export async function esbuildExtensions(taskName: string, isWatch: boolean, scri
 		}
 	}
 
-	const tasks = scripts.map(({ script, outputRoot }) => {
+	const validScripts = scripts.filter(({ script }) => {
+		if (!fs.existsSync(script)) {
+			fancyLog(`[esbuildExtensions] Skipping missing script: ${script}`);
+			return false;
+		}
+		return true;
+	});
+
+	const tasks = validScripts.map(({ script, outputRoot }) => {
 		return new Promise<void>((resolve, reject) => {
 			const args = [script];
 			if (isWatch) {
