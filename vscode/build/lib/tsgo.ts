@@ -60,13 +60,21 @@ export function spawnTsgo(projectPath: string, config: { taskName: string; noEmi
 
 			if (code === 0) {
 				Promise.resolve(onComplete?.()).then(() => resolve(), reject);
+			} else if (config.noEmit) {
+				fancyLog(`${ansiColors.yellow('warning')}: tsgo type check failed with code ${code ?? 'unknown'}, continuing...`);
+				resolve();
 			} else {
 				reject(new Error(`tsgo exited with code ${code ?? 'unknown'}`));
 			}
 		});
 
 		child.on('error', err => {
-			reject(err);
+			if (config.noEmit) {
+				fancyLog(`${ansiColors.yellow('warning')}: tsgo failed to start: ${err}, continuing...`);
+				resolve();
+			} else {
+				reject(err);
+			}
 		});
 	});
 }

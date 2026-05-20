@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+env:
+  VSCODE_QUALITY: insider
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build:
     name: Build ${{ matrix.platform }}
@@ -70,45 +74,51 @@ jobs:
             Write-Host "Removed copilot extension"
           }
 
-      - name: Install all dependencies
+      - name: Install dependencies
         working-directory: vscode
         env:
+          npm_config_arch: ${{ matrix.arch }}
+          npm_config_foreground_scripts: "true"
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
           VSCODE_FORCE_INSTALL: '1'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm install
 
       - name: Patch vsce npm.js for shell compatibility
         working-directory: vscode/build
         run: node patch-vsce.js
 
-      - name: Build Windows client
+      - name: Download built-in extensions
+        working-directory: vscode
+        run: node --experimental-strip-types build/lib/builtInExtensions.ts
+
+      - name: Compile (core-ci)
+        working-directory: vscode
+        run: npm run gulp core-ci
+        env:
+          VSCODE_ARCH: ${{ matrix.arch }}
+
+      - name: Package Windows client
         if: runner.os == 'Windows'
         working-directory: vscode
-        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-win32-${{ matrix.arch }}"
+        run: npm run gulp "vscode-win32-${{ matrix.arch }}-min-ci"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Build Linux client
+      - name: Package Linux client
         if: runner.os == 'Linux'
         working-directory: vscode
-        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-linux-${{ matrix.arch }}"
+        run: npm run gulp "vscode-linux-${{ matrix.arch }}-min-ci"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_OPTIONS: --max-old-space-size=4096
 
-      - name: Build macOS client
+      - name: Package macOS client
         if: runner.os == 'macOS'
         working-directory: vscode
-        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js "vscode-darwin-${{ matrix.arch }}"
+        run: npm run gulp "vscode-darwin-${{ matrix.arch }}-min-ci"
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Locate build output
         shell: pwsh
