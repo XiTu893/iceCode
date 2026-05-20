@@ -89,10 +89,6 @@ jobs:
         working-directory: vscode/build
         run: node patch-vsce.js
 
-      - name: Download built-in extensions
-        working-directory: vscode
-        run: node --experimental-strip-types build/lib/builtInExtensions.ts
-
       - name: Compile (core-ci)
         working-directory: vscode
         run: npm run gulp core-ci
