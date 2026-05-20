@@ -74,6 +74,14 @@ jobs:
             Write-Host "Removed copilot extension"
           }
 
+      - name: Cache built-in extensions
+        uses: actions/cache@v4
+        with:
+          path: vscode/.build/builtInExtensions
+          key: builtin-exts-${{ hashFiles('vscode/product.json') }}
+          restore-keys: |
+            builtin-exts-
+
       - name: Install dependencies
         working-directory: vscode
         env:

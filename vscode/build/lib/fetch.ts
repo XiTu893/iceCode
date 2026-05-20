@@ -41,12 +41,12 @@ export function fetchUrls(urls: string[] | string, options: IFetchOptions): es.T
 	}));
 }
 
-export async function fetchUrl(url: string, options: IFetchOptions, retries = 10, retryDelay = 1000): Promise<VinylFile> {
+export async function fetchUrl(url: string, options: IFetchOptions, retries = 15, retryDelay = 2000): Promise<VinylFile> {
 	const verbose = !!options.verbose || !!process.env['CI'] || !!process.env['BUILD_ARTIFACTSTAGINGDIRECTORY'] || !!process.env['GITHUB_WORKSPACE'];
 	try {
 		let startTime = 0;
 		if (verbose) {
-			log(`Start fetching ${ansiColors.magenta(url)}${retries !== 10 ? ` (${10 - retries} retry)` : ''}`);
+			log(`Start fetching ${ansiColors.magenta(url)}${retries !== 15 ? ` (${15 - retries} retry)` : ''}`);
 			startTime = new Date().getTime();
 		}
 		const controller = new AbortController();
@@ -97,8 +97,13 @@ export async function fetchUrl(url: string, options: IFetchOptions, retries = 10
 			log(`Fetching ${ansiColors.cyan(url)} failed: ${e}`);
 		}
 		if (retries > 0) {
-			await new Promise(resolve => setTimeout(resolve, retryDelay));
-			return fetchUrl(url, options, retries - 1, retryDelay);
+			const is429 = e instanceof Error && /status code: 429/.test(e.message);
+			const delay = is429 ? Math.min(retryDelay * 4, 60000) : retryDelay;
+			if (verbose) {
+				log(`Retrying ${ansiColors.cyan(url)} in ${delay}ms (${15 - retries + 1}/15)...`);
+			}
+			await new Promise(resolve => setTimeout(resolve, delay));
+			return fetchUrl(url, options, retries - 1, is429 ? delay * 2 : retryDelay);
 		}
 		throw e;
 	}
