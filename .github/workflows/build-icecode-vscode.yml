@@ -77,14 +77,6 @@ jobs:
             Write-Host "Removed copilot extension"
           }
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: vscode/node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('vscode/package.json') }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-
-
       - name: Cache built-in extensions
         uses: actions/cache@v4
         with:
@@ -98,11 +90,39 @@ jobs:
         env:
           npm_config_arch: ${{ matrix.arch }}
           npm_config_foreground_scripts: "true"
-          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
           GYP_MSVS_VERSION: '2022'
           VSCODE_FORCE_INSTALL: '1'
         run: npm install --no-fund --no-audit 2>&1 || npm install --no-fund --no-audit 2>&1
+
+      - name: Verify extension dependencies
+        shell: pwsh
+        run: |
+          $extDirs = @(
+            "vscode/extensions/git",
+            "vscode/extensions/json-language-features/server",
+            "vscode/extensions/css-language-features/server",
+            "vscode/extensions/html-language-features/server",
+            "vscode/extensions/typescript-language-features",
+            "vscode/extensions/markdown-language-features",
+            "vscode/extensions/icecode-ai"
+          )
+          foreach ($dir in $extDirs) {
+            $pkgJson = Join-Path $dir "package.json"
+            $nodeModules = Join-Path $dir "node_modules"
+            if (Test-Path $pkgJson) {
+              $pkg = Get-Content $pkgJson | ConvertFrom-Json
+              $hasDeps = ($pkg.dependencies -and ($pkg.dependencies | Get-Member -MemberType NoteProperty).Count -gt 0)
+              if ($hasDeps -and -not (Test-Path $nodeModules)) {
+                Write-Host "Installing missing deps for $dir"
+                Set-Location $dir
+                npm install --no-fund --no-audit 2>&1
+                Set-Location $env:GITHUB_WORKSPACE
+              } else {
+                Write-Host "OK: $dir"
+              }
+            }
+          }
 
       - name: Patch vsce npm.js for shell compatibility
         working-directory: vscode/build
