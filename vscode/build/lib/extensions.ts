@@ -174,12 +174,15 @@ function fromLocalNormal(extensionPath: string): Stream {
 			const files = fileNames
 				.map(fileName => path.join(extensionPath, fileName))
 				.filter(filePath => fs.existsSync(filePath))
-				.map(filePath => new File({
-					path: filePath,
-					stat: fs.statSync(filePath),
-					base: extensionPath,
-					contents: fs.createReadStream(filePath)
-				}));
+				.map(filePath => {
+					const stat = fs.statSync(filePath);
+					return new File({
+						path: filePath,
+						stat: { ...stat, isFile: () => stat.isFile(), isDirectory: () => stat.isDirectory(), isSymbolicLink: () => stat.isSymbolicLink() },
+						base: extensionPath,
+						contents: fs.createReadStream(filePath)
+					});
+				});
 
 			if (files.length === 0) {
 				finish();
@@ -261,12 +264,15 @@ function fromLocalEsbuild(extensionPath: string, esbuildConfigFileName: string):
 		const files = fileNames
 			.map(fileName => path.join(extensionPath, fileName))
 			.filter(filePath => fs.existsSync(filePath))
-			.map(filePath => new File({
-				path: filePath,
-				stat: fs.statSync(filePath),
-				base: extensionPath,
-				contents: fs.createReadStream(filePath)
-			}));
+			.map(filePath => {
+				const stat = fs.statSync(filePath);
+				return new File({
+					path: filePath,
+					stat: { ...stat, isFile: () => stat.isFile(), isDirectory: () => stat.isDirectory(), isSymbolicLink: () => stat.isSymbolicLink() },
+					base: extensionPath,
+					contents: fs.createReadStream(filePath)
+				});
+			});
 
 		if (files.length === 0) {
 			fancyLog(`[fromLocalEsbuild] Warning: No files collected for ${extensionName}`);

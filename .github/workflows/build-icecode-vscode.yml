@@ -128,9 +128,33 @@ jobs:
         working-directory: vscode/build
         run: node patch-vsce.js
 
+      - name: Pre-build diagnostics
+        shell: pwsh
+        working-directory: vscode
+        run: |
+          Write-Host "=== Node version ==="
+          node --version
+          Write-Host "=== npm version ==="
+          npm --version
+          Write-Host "=== Gulpfile exists ==="
+          Test-Path "gulpfile.mjs"
+          Write-Host "=== product.json exists ==="
+          Test-Path "product.json"
+          Write-Host "=== build/next/index.ts exists ==="
+          Test-Path "build/next/index.ts"
+          Write-Host "=== build/node_modules/@vscode/vsce exists ==="
+          Test-Path "build/node_modules/@vscode/vsce"
+          Write-Host "=== extensions/git/node_modules exists ==="
+          Test-Path "extensions/git/node_modules"
+          Write-Host "=== Gulp tasks (first 20) ==="
+          node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js --tasks 2>&1 | Select-Object -First 20
+          Write-Host "=== package.json scripts.gulp ==="
+          $pkg = Get-Content package.json | ConvertFrom-Json
+          Write-Host $pkg.scripts.gulp
+
       - name: Build client
         working-directory: vscode
-        run: npm run gulp "${{ matrix.gulp_target }}"
+        run: node --experimental-strip-types --max-old-space-size=4096 ./node_modules/gulp/bin/gulp.js ${{ matrix.gulp_target }}
         env:
           VSCODE_ARCH: ${{ matrix.arch }}
 

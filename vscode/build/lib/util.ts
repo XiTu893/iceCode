@@ -386,7 +386,7 @@ export function getVersionedResourcesFolder(platform: string, commit: string): s
 	return useVersionedUpdate ? commit.substring(0, 10) : '';
 }
 
-export class VinylStat implements fs.Stats {
+export class VinylStat {
 
 	readonly dev: number;
 	readonly ino: number;
