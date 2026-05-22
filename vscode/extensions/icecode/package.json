@@ -133,8 +133,5 @@
     "@types/vscode": "^1.90.0",
     "esbuild": "^0.23.x"
   },
-  "dependencies": {
-    "@grpc/grpc-js": "^1.10.x",
-    "@grpc/proto-loader": "^0.7.x"
-  }
+  "dependencies": {}
 }
