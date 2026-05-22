@@ -14,7 +14,7 @@ esbuild.build({
   outdir: path.join(__dirname, 'dist'),
   platform: 'node',
   target: ['node20'],
-  external: ['vscode'],
+  external: ['vscode', '@grpc/grpc-js', '@grpc/proto-loader'],
   sourcemap: true,
   minify: false,
   format: 'cjs',
