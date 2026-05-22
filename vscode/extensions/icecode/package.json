@@ -1,0 +1,140 @@
+{
+  "name": "icecode",
+  "displayName": "IceCode AI Coding",
+  "description": "AI-powered coding assistant based on IceCode",
+  "version": "1.0.0",
+  "publisher": "icecode",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "coding",
+    "assistant",
+    "icecode",
+    "claude"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguage"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "icecode.chat",
+        "title": "IceCode: Open Chat",
+        "category": "IceCode"
+      },
+      {
+        "command": "icecode.explainCode",
+        "title": "IceCode: Explain Code",
+        "category": "IceCode"
+      },
+      {
+        "command": "icecode.fixCode",
+        "title": "IceCode: Fix Code",
+        "category": "IceCode"
+      },
+      {
+        "command": "icecode.refactorCode",
+        "title": "IceCode: Refactor Code",
+        "category": "IceCode"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "icecode.chat",
+          "when": "true"
+        },
+        {
+          "command": "icecode.explainCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "icecode.fixCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "icecode.refactorCode",
+          "when": "editorHasSelection"
+        }
+      ],
+      "editor/context": [
+        {
+          "submenu": "icecode.submenu",
+          "group": "navigation@100"
+        }
+      ],
+      "icecode.submenu": [
+        {
+          "command": "icecode.explainCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "icecode.fixCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "icecode.refactorCode",
+          "when": "editorHasSelection"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "icecode.submenu",
+        "label": "IceCode AI"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "icecode",
+        "name": "IceCode",
+        "description": "AI coding assistant powered by IceCode",
+        "isSticky": true
+      }
+    ],
+    "configuration": {
+      "title": "IceCode",
+      "properties": {
+        "icecode.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for IceCode"
+        },
+        "icecode.apiUrl": {
+          "type": "string",
+          "default": "",
+          "description": "API URL for IceCode (custom base URL, optional)"
+        },
+        "icecode.model": {
+          "type": "string",
+          "default": "claude-3-5-sonnet-20241022",
+          "description": "Model to use for AI coding"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "node build.js",
+    "watch": "echo \"Watch mode not implemented\""
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.90.0",
+    "esbuild": "^0.23.x"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.x",
+    "@grpc/proto-loader": "^0.7.x"
+  }
+}
